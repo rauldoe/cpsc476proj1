@@ -19,6 +19,7 @@ def forums():
     f.name = "paul"
     f.creator = "testor"
 
+
     forumList.append(f)
 
     f = forum()
