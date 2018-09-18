@@ -7,5 +7,5 @@ class forum:
         return {
             'id': self.id, 
             'name': self.name,
-            'creator': self.creator,
+            'creator': self.creator
         }
