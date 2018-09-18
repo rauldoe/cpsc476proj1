@@ -2,5 +2,11 @@
 
 Powershell:
 
-$env:FLASK_APP = "proj1.py";
+$env:FLASK_APP = "proj1.py"
 flask run
+
+To run in browser:
+
+http://localhost:5000/forums
+
+
