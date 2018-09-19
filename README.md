@@ -21,6 +21,11 @@ curl -i -H "Content-Type: application/json" -X POST -d '{"name":"test"}' http://
 
 Postman:
 url: http://localhost:5000/forums
+method: GET
+header-key: Content-Type
+header-value: application/json
+
+url: http://localhost:5000/forums
 method: POST
 header-key: Content-Type
 header-value: application/json

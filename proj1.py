@@ -23,7 +23,7 @@ GET = "GET"
 POST = "POST"
 
 forumsUrl = "/forums"
-forumsFromIdUrl = forumsUrl + "/<int:id>"
+forumsFromIdUrl = forumsUrl + "/<int:forum_id>"
 
 dbPath = "test.db"
 
