@@ -30,6 +30,7 @@ url: http://localhost:5000/forums/1
 method: GET
 header-key: Content-Type
 header-value: application/json
+authorization type: Basic Auth
 
 To run in browser:
 http://localhost:5000/forums
