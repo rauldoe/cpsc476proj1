@@ -41,9 +41,9 @@ exit()
 
 clear;python or clear;python3
 >>> 
-from db import executeSchema
+from db import executeScriptPath
 >>>
-executeSchema("test.db", "init.sql")
+executeScriptPath("test.db", "init.sql")
 >>>
 exit()
 

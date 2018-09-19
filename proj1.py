@@ -7,6 +7,8 @@ from flask import g
 from flask import request
 from flask import jsonify
 from flask import make_response
+
+from db import db
 from forum import forum
 from forumList import forumList
 
@@ -20,12 +22,22 @@ POST = "POST"
 forumsUrl = "/forums"
 forumsFromIdUrl = forumsUrl + "/<int:id>"
 
+dbPath = "test.db"
+
 app = Flask(__name__)
 
 @app.route(forumsUrl, methods=[GET])
 def forumsGet():
 
-    ilist = forumList.test()
+    ilist = forumList()
+
+    query = "SELECT id, name, creator FROM {table};".format(table="forums")
+    conn = db.initDb(dbPath)
+    dataList = db.executeReturnList(conn, query)
+    for i in dataList:
+        ilist.appendItem(i["id"], i["name"], i["creator"])
+
+    db.closeDb(conn)
 
     return make_response(ilist.serialize(), Ok)
 

@@ -1,39 +1,54 @@
 import sqlite3
 
-#executeSchema("test.db", "init.sql")
-def executeSchema(dbPath, schemaPath):
+class db:
+    #executeScriptPath("test.db", "init.sql")
+    @staticmethod
+    def executeScriptPath(dbPath, scriptPath):
 
-    conn = initDb(dbPath)
-    schema = loadFile(schemaPath)
-    executeScript(conn, schema)
-    closeDb(conn)
+        conn = db.initDb(dbPath)
+        script = db.loadFile(scriptPath)
+        db.executeScript(conn, script)
+        db.closeDb(conn)
 
-#support functions
-def initDb(dbPath):
-    conn = sqlite3.connect(
-            dbPath,
-            detect_types=sqlite3.PARSE_DECLTYPES
-        )
-    return conn
+    #support functions
+    @staticmethod
+    def initDb(dbPath):
+        conn = sqlite3.connect(
+                dbPath,
+                detect_types=sqlite3.PARSE_DECLTYPES
+            )
+        conn.row_factory = sqlite3.Row
+        return conn
 
-def closeDb(conn):
-    conn.commit()
-    conn.close()
+    @staticmethod
+    def closeDb(conn):
+        conn.commit()
+        conn.close()
 
-def execute(conn, query):
-    cur = conn.cursor()
-    cur.execute(query)
+    @staticmethod
+    def execute(conn, query):
+        cur = conn.cursor()
+        cur.execute(query)
 
-def executeScript(conn, queryFromScript):
-    cur = conn.cursor()
-    cur.executescript(queryFromScript)
+        return cur
 
-def loadFile(filePath):
-    data = ""
+    @staticmethod
+    def executeReturnList(conn, query):
+        cur = db.execute(conn, query)
+        dataList = cur.fetchall()
 
-    with open(filePath, 'r') as filePtr:
-        data = filePtr.read().replace('\n', '')
+        return dataList
 
-    return data
+    @staticmethod
+    def executeScript(conn, queryFromScript):
+        cur = conn.cursor()
+        cur.executescript(queryFromScript)
 
+    @staticmethod
+    def loadFile(filePath):
+        data = ""
 
+        with open(filePath, 'r') as filePtr:
+            data = filePtr.read().replace('\n', '')
+
+        return data
