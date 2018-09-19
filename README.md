@@ -1,7 +1,11 @@
 "# cpsc476proj1"
 
 installation:
-pip install flask
+python -m pip install flask
+python -m pip install Flask-BasicAuth
+
+python3 -m pip install flask
+python3 -m pip install Flask-BasicAuth
 
 Powershell:
 $env:FLASK_APP = "proj1.py"
