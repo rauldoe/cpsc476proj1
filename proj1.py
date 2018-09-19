@@ -1,63 +1,51 @@
+#!flask/bin/python3
 
 import sqlite3
 
-from flask import Flask, jsonify
+from flask import Flask
 from flask import g
+from flask import request
+from flask import jsonify
+from flask import make_response
 from forum import forum
+from forumList import forumList
+
+Ok = 200
+Created = 201
+NotFound = 404
+
+GET = "GET"
+POST = "POST"
+
+forumsUrl = "/forums"
+forumsFromIdUrl = forumsUrl + "/<int:id>"
 
 app = Flask(__name__)
 
-@app.route("/")
-def hello():
-    return "Hello World!"
+@app.route(forumsUrl, methods=[GET])
+def forumsGet():
 
-@app.route("/forums")
-def forums():
+    ilist = forumList.test()
 
-    forumList = []
+    return make_response(ilist.serialize(), Ok)
 
-    f = forum()
+@app.route(forumsUrl, methods=[POST])
+def forumsPost():
 
-    f.id = 290
-    f.name = "paul"
-    f.creator = "testor"
+    obj = forum.deserialize(request.json)
+    return make_response(obj.serializeJson(), Created)
 
+@app.route("/forums/<int:forum_id>", methods=[GET])
+def forumsFromIdGet(forum_id):
 
-    forumList.append(f)
+    ilist = forumList.test()
+    subList = ilist.find(forum_id)
 
-    f = forum()
+    return make_response(subList.serialize(), Ok)
 
-    f.id = 29022
-    f.name = "paulddd"
-    f.creator = "testorss"
+@app.errorhandler(NotFound)
+def notFound(error):
+    return make_response(jsonify({'error': 'Not found'}), NotFound)
 
-    forumList.append(f)
-
-    return jsonify([i.serialize() for i in forumList])
-
-DATABASE = "database.db"
-
-def get_db():
-    db = getattr(g, "_database", None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    return db
-
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, "_database", None)
-    if db is not None:
-        db.close()
-
-def query_db(query, args=(), one=False):
-    cur = get_db().execute(query, args)
-    rv = cur.fetchall()
-    cur.close()
-    return (rv[0] if v else None) if one else rv
-
-def init_db():
-    with app.app_context():
-        db = get_db()
-        with app.open_resource("schema.sql", mode="r") as f:
-            db.cursor().executescript(f.read())
-        db.commit()
+if __name__ == '__main__':
+    app.run(debug=True)

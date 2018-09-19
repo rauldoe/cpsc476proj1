@@ -1,34 +1,39 @@
 import sqlite3
 
-from flask import current_app, g
+#executeSchema("test.db", "init.sql")
+def executeSchema(dbPath, schemaPath):
 
-#from flask.cli import with_appcontext
+    conn = initDb(dbPath)
+    schema = loadFile(schemaPath)
+    executeScript(conn, schema)
+    closeDb(conn)
 
-dbKey = "db"
-dbConfigKey = "DATABASE"
-schemaFile = "schema.sql"
-encoding = "utf8"
-
-
-def get_db():
-    if dbKey not in g:
-        g.db = sqlite3.connect(
-            current_app.config[dbConfigKey],
+#support functions
+def initDb(dbPath):
+    conn = sqlite3.connect(
+            dbPath,
             detect_types=sqlite3.PARSE_DECLTYPES
         )
-        g.db.row_factory = sqlite3.Row
+    return conn
 
-    return g.db
+def closeDb(conn):
+    conn.commit()
+    conn.close()
+
+def execute(conn, query):
+    cur = conn.cursor()
+    cur.execute(query)
+
+def executeScript(conn, queryFromScript):
+    cur = conn.cursor()
+    cur.executescript(queryFromScript)
+
+def loadFile(filePath):
+    data = ""
+
+    with open(filePath, 'r') as filePtr:
+        data = filePtr.read().replace('\n', '')
+
+    return data
 
 
-def close_db(e=None):
-    db = g.pop(dbKey, None)
-
-    if db is not None:
-        db.close()
-
-def init_db():
-    db = get_db()
-
-    with current_app.open_resource(schemaFile) as f:
-        db.executescript(f.read().decode(encoding))
