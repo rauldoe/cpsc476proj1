@@ -52,7 +52,7 @@ def forumsPost():
     obj = forum.deserialize(request.json)
     return make_response(obj.serializeJson(), Created)
 
-@app.route("/forums/<int:forum_id>", methods=[GET])
+@app.route(forumsFromIdUrl, methods=[GET])
 @basic_auth.required
 def forumsFromIdGet(forum_id):
 
