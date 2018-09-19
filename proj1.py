@@ -1,63 +1,27 @@
 
 import sqlite3
 
-from flask import Flask, jsonify
+from flask import Flask
 from flask import g
+from flask import request
+from flask import jsonify
 from forum import forum
+from forumList import forumList
 
 app = Flask(__name__)
-
-@app.route("/")
-def hello():
-    return "Hello World!"
 
 @app.route("/forums")
 def forums():
 
-    forumList = []
+    list = forumList()
 
-    f = forum()
+    list.appendItem(1, "name1", "creator1")
+    list.appendItem(2, "name2", "creator2")
+    list.appendItem(3, "name3", "creator3")
 
-    f.id = 290
-    f.name = "paul"
-    f.creator = "testor"
+    return list.serialize()
 
-
-    forumList.append(f)
-
-    f = forum()
-
-    f.id = 29022
-    f.name = "paulddd"
-    f.creator = "testorss"
-
-    forumList.append(f)
-
-    return jsonify([i.serialize() for i in forumList])
-
-DATABASE = "database.db"
-
-def get_db():
-    db = getattr(g, "_database", None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    return db
-
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, "_database", None)
-    if db is not None:
-        db.close()
-
-def query_db(query, args=(), one=False):
-    cur = get_db().execute(query, args)
-    rv = cur.fetchall()
-    cur.close()
-    return (rv[0] if v else None) if one else rv
-
-def init_db():
-    with app.app_context():
-        db = get_db()
-        with app.open_resource("schema.sql", mode="r") as f:
-            db.cursor().executescript(f.read())
-        db.commit()
+@app.route("/forums", methods=["POST"])
+def forumsPost():
+    #return forum(0, "test", "").serialize(), 201
+    return jsonify(forum.deserialize(request.json).serialize()), 201
