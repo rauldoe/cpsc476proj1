@@ -7,10 +7,13 @@ from flask import g
 from flask import request
 from flask import jsonify
 from flask import make_response
+from flask import current_app
+from flask_basicauth import BasicAuth
 
 from db import db
 from forum import forum
 from forumList import forumList
+from cpsc476Auth import cpsc476Auth
 
 Ok = 200
 Created = 201
@@ -25,6 +28,8 @@ forumsFromIdUrl = forumsUrl + "/<int:id>"
 dbPath = "test.db"
 
 app = Flask(__name__)
+
+basic_auth = cpsc476Auth(app)
 
 @app.route(forumsUrl, methods=[GET])
 def forumsGet():
@@ -48,10 +53,13 @@ def forumsPost():
     return make_response(obj.serializeJson(), Created)
 
 @app.route("/forums/<int:forum_id>", methods=[GET])
+@basic_auth.required
 def forumsFromIdGet(forum_id):
 
     ilist = forumList.test()
     subList = ilist.find(forum_id)
+
+    subList.mList[0].creator = basic_auth.username
 
     return make_response(subList.serialize(), Ok)
 

@@ -1,7 +1,11 @@
 "# cpsc476proj1"
 
 installation:
-pip install flask
+python -m pip install flask
+python -m pip install Flask-BasicAuth
+
+python3 -m pip install flask
+python3 -m pip install Flask-BasicAuth
 
 Powershell:
 $env:FLASK_APP = "proj1.py"
@@ -26,6 +30,7 @@ url: http://localhost:5000/forums/1
 method: GET
 header-key: Content-Type
 header-value: application/json
+authorization type: Basic Auth
 
 To run in browser:
 http://localhost:5000/forums
