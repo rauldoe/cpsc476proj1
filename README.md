@@ -31,19 +31,28 @@ To run in browser:
 http://localhost:5000/forums
 
 execution:
-clear;python or clear;python3
+clear;python 
+clear;python3
+
 >>> 
 from proj1 import forumsGet
+
 >>> 
 forumsGet()
+
 >>>
 exit()
 
-clear;python or clear;python3
+execution1:
+clear;python
+clear;python3
+
 >>> 
-from db import executeScriptPath
+from db import db
+
 >>>
-executeScriptPath("test.db", "init.sql")
+db.executeScriptPath("test.db", "init.sql")
+
 >>>
 exit()
 
