@@ -1,3 +1,5 @@
+from flask import jsonify
+
 class forum:
     id = 0
     name = ""
@@ -14,7 +16,11 @@ class forum:
             'name': self.name,
             'creator': self.creator
         }
+    
+    def serializeJson(self):
+        return jsonify(self.serialize())
 
     @staticmethod
-    def deserialize(json):
-        return forum(0, json["name"], "")
+    def deserialize(jsonObj):
+        return forum(0, jsonObj["name"], "")
+

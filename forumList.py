@@ -13,3 +13,8 @@ class forumList:
 
     def serialize(self):
         return jsonify([i.serialize() for i in self.list])
+
+    def find(self, id):
+        subList = forumList()
+        [subList.append(i) for i in self.list]
+        return subList
