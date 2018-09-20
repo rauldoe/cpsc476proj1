@@ -40,6 +40,10 @@ class db:
         return dataList
 
     @staticmethod
+    def executeNonQuery(conn, query):
+        db.execute(conn, query)
+
+    @staticmethod
     def executeScript(conn, queryFromScript):
         cur = conn.cursor()
         cur.executescript(queryFromScript)

@@ -1,5 +1,7 @@
 import datetime
+
 from flask import jsonify
+from commonUtility import commonUtility
 
 class threadConversation:
     id = 0
@@ -32,5 +34,13 @@ class threadConversation:
 
     @staticmethod
     def deserialize(jsonObj):
-        return threadConversation(0, jsonObj["forum_id"], jsonObj["title"],jsonObj["text1"],jsonObj["author"],jsonObj["timestamp1"])
+
+        id = 0
+        forum_id = commonUtility.dictGetSafe(jsonObj, "forum_id")
+        title = commonUtility.dictGetSafe(jsonObj, "title")
+        text = commonUtility.dictGetSafe(jsonObj, "text")
+        author = commonUtility.dictGetSafe(jsonObj, "author")
+        timestamp1 = commonUtility.dictGetSafe(jsonObj, "timestamp1")
+
+        return threadConversation(id, forum_id, title, text, author, timestamp1)
 
