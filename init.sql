@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS threads;
 DROP TABLE IF EXISTS forums;
 DROP TABLE IF EXISTS users;
@@ -24,4 +25,14 @@ CREATE TABLE threads (
   timestamp1 DATETIME NOT NULL,
   FOREIGN KEY (forum_id) REFERENCES forums (id),
   FOREIGN KEY (author) REFERENCES users (username)
+);
+
+CREATE TABLE posts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  thread_id INTEGER NOT NULL,
+  text1 VARCHAR(1000) NOT NULL,
+  poster VARCHAR(250) NOT NULL,
+  timestamp1 DATETIME NOT NULL,
+  FOREIGN KEY (thread_id) REFERENCES threads (id),
+  FOREIGN KEY (poster) REFERENCES users (username)
 );

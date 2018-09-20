@@ -25,7 +25,7 @@ POST = "POST"
 forumsUrl = "/forums"
 forumsFromIdUrl = forumsUrl + "/<int:forum_id>"
 
-dbPath = "test.db"
+dbPath = "proj1.db"
 
 app = Flask(__name__)
 

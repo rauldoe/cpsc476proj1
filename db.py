@@ -1,7 +1,7 @@
 import sqlite3
 
 class db:
-    #executeScriptPath("test.db", "init.sql")
+    #executeScriptPath("proj1.db", "init.sql")
     @staticmethod
     def executeScriptPath(dbPath, scriptPath):
 
