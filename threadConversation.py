@@ -32,5 +32,7 @@ class threadConversation:
 
     @staticmethod
     def deserialize(jsonObj):
+
+        forum_id = 
         return threadConversation(0, jsonObj["forum_id"], jsonObj["title"], jsonObj["text"],jsonObj["author"], jsonObj["timestamp1"])
 
