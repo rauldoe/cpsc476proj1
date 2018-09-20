@@ -1,6 +1,9 @@
 
-from forum import forum
+
 from flask import jsonify
+
+from forum import forum
+from db import db
 
 class forumList:
     mList = []
@@ -15,6 +18,21 @@ class forumList:
         ilist.appendItem(1, "name1", "creator1")
         ilist.appendItem(2, "name2", "creator2")
         ilist.appendItem(3, "name3", "creator3")
+
+        return ilist
+
+    @staticmethod
+    def loadList(dbPath):
+
+        ilist = forumList()
+
+        query = "SELECT id, name, creator FROM {table};".format(table="forums")
+        conn = db.initDb(dbPath)
+        dataList = db.executeReturnList(conn, query)
+        for i in dataList:
+            ilist.appendItem(i["id"], i["name"], i["creator"])
+
+        db.closeDb(conn)
 
         return ilist
 
