@@ -65,7 +65,7 @@ def createThread(forum_id):
     obj.timestamp1 = datetime.datetime.now()
 
     #INSERT INTO threads(forum_id, title, text1, author, timestamp1) VALUES (1, 'first thread - first forum', 'hey this is great', 'paul', date('now'));
-    query = "INSERT INTO threads(forum_id, title, text1, author, timestamp1) "+"VALUES ({forum_id},  {title}, {text}, {author}, {timestamp})".format(forum_id=obj.forum_id, title=obj.title, text=obj.text1, author=obj.author, timestamp=obj.timestamp1)
+    query = "INSERT INTO threads(forum_id, title, text1, author, timestamp1) "+"VALUES ('{forum_id}',  '{title}', '{text}', '{author}', '{timestamp}')".format(forum_id=obj.forum_id, title=obj.title, text=obj.text1, author=obj.author, timestamp=obj.timestamp1)
     
     conn = db.initDb(dbPath)
     db.executeNonQuery(conn, query)
@@ -73,7 +73,7 @@ def createThread(forum_id):
 
     response = make_response(obj.serializeJson(), httpUtility.Created)
 
-    response.headers["Location"] = forumsUrl + "/" + forum_id + "/" + thread_id
+    response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url=forumsUrl, forum_id=forum_id, thread_id=thread_id)
 
     return response
 
