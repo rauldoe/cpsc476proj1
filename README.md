@@ -61,7 +61,7 @@ clear;python3
 from db import db
 
 >>>
-db.executeScriptPath("test.db", "init.sql")
+db.executeScriptPath("proj1.db", "init.sql")
 
 >>>
 exit()
