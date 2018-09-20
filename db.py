@@ -33,11 +33,14 @@ class db:
         return cur
 
     @staticmethod
+    def executeReturnOne(conn, query):
+        cur = db.execute(conn, query)
+        return cur.fetchone()
+    
+    @staticmethod
     def executeReturnList(conn, query):
         cur = db.execute(conn, query)
-        dataList = cur.fetchall()
-
-        return dataList
+        return cur.fetchall()
 
     @staticmethod
     def executeNonQuery(conn, query):
