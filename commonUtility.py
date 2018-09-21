@@ -6,4 +6,4 @@ class commonUtility:
         if key in dict:
             return dict[key]
         else:
-            return None
+            return sssssss
