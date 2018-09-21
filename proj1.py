@@ -43,9 +43,24 @@ def getForums():
 @basic_auth.required
 def createForum():
 
-    #basic_auth.username
     obj = forum.deserialize(request.json)
-    return make_response(obj.serializeJson(), httpUtility.Created)
+    obj.creator = basic_auth.username
+
+    #obj.name
+    #SELECT name from forums WHERE name = {obj.name}
+    query = "INSERT INTO forums(name, creator) "\
+        + "VALUES ('{name}',  '{creator}');".format(name=obj.name, creator=obj.creator)
+    conn = db.initDb(dbPath)
+    id = db.executeReturnId(conn, query)
+    db.closeDb(conn)
+
+    obj.id = id
+
+    response = make_response(obj.serializeJson(), httpUtility.Created)
+
+    response.headers["Location"] = "{url}/{forum_id}".format(url=forumsUrl, forum_id=obj.id)
+
+    return response
 
 @app.route(forumsFromForumIdUrl, methods=[httpUtility.GET])
 def getThreadsByForum(forum_id):
@@ -72,7 +87,7 @@ def createThread(forum_id):
 
     #INSERT INTO threads(forum_id, title, text1, author, timestamp1) VALUES (1, 'first thread - first forum', 'hey this is great', 'paul', date('now'));
     query = "INSERT INTO threads(forum_id, title, text1, author, timestamp1) "\
-        + "VALUES ('{forum_id}',  '{title}', '{text}', '{author}', '{timestamp}');".format(forum_id=obj.forum_id, title=obj.title, text=obj.text1, author=obj.author, timestamp=obj.timestamp1)    
+        + "VALUES ('{forum_id}',  '{title}', '{text}', '{author}', '{timestamp}');".format(forum_id=obj.forum_id, title=obj.title, text=obj.text1, author=obj.author, timestamp=obj.timestamp1)
     conn = db.initDb(dbPath)
     id = db.executeReturnId(conn, query)
     db.closeDb(conn)
@@ -101,7 +116,25 @@ def createPost(forum_id, thread_id):
 
     #basic_auth.username
     obj = forum.deserialize(request.json)
-    return make_response(obj.serializeJson(), httpUtility.Created)
+    obj.thread_id=thread_id
+    obj.poster = basic_auth.username
+    obj.timestamp1 = datetime.datetime.now()
+
+    query = "INSERT INTO posts(thread_id, text1, poster, timestamp1) "\
+        + "VALUES ('{thread_id}',  '{text}', '{poster}', '{timestamp}');".format(thread_id=obj.thread_id, text=obj.text1, poster=obj.poster, timestamp=obj.timestamp1)
+    conn = db.initDb(dbPath)
+    forum_id=obj.forum_id
+    thread_id = db.executeReturnId(conn, query)
+    db.closeDb(conn)
+
+    obj.id = thread_id
+
+    response = make_response(obj.serializeJson(), httpUtility.Created)
+
+    response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url=forumsUrl, forum_id=forum_id, thread_id=thread_id)
+
+    return response
+
 
 @app.route(usersUrl, methods=[httpUtility.POST])
 def createUser():
