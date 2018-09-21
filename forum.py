@@ -4,31 +4,28 @@ from objectBase import objectBase
 
 class forum(objectBase):
 
-    def __init__(self, id, name, creator):
-        super().__init__(id)
+    def __init__(self):
+        super().__init__()
 
-        self.name = name
-        self.creator = creator
+        self.objectLookup[self.name_tag] = None
+        self.objectLookup[self.creator_tag] = None
 
-    nameTag = "name"
+    name_tag = "name"
     @property
     def name(self):
-        return self.objectLookup[self.nameTag]
+        return self.objectLookup[self.name_tag]
 
     @name.setter
     def name(self, value):
-        self.objectLookup[self.nameTag] = value
+        self.objectLookup[self.name_tag] = value
     
-    creatorTag = "creator"
+    creator_tag = "creator"
     @property
     def creator(self):
-        return self.objectLookup[self.creatorTag]
+        return self.objectLookup[self.creator_tag]
 
     @creator.setter
     def creator(self, value):
-        self.objectLookup[self.creatorTag] = value
+        self.objectLookup[self.creator_tag] = value
 
-    @staticmethod
-    def deserialize(jsonObj):
-        return forum(0, jsonObj["name"], "")
 

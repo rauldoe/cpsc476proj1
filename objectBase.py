@@ -1,13 +1,18 @@
 
 from flask import jsonify
 
-class objectBase:
-    _idTag = "id"
-    _objectName = "objectName"
-    _objectLookup = {}
+from commonUtility import commonUtility
 
-    def __init__(self, id):
-        self.id = id
+class objectBase:
+    _id_tag = "id"
+    _objectName_tag = "objectName"
+
+    def __init__(self):
+        self._objectLookup = {}
+        self._objectLookup[self._id_tag] = None
+        self._objectLookup[self._objectName_tag] = "{oname}s".format(oname=self.__class__.__name__)
+        self._objectType = self.__class__
+        self.id = None
 
     @property
     def objectLookup(self):
@@ -25,27 +30,42 @@ class objectBase:
     #id
     @property
     def id(self):
-        return self._objectLookup[self._idTag]
+        return self._objectLookup[self._id_tag]
 
     @id.setter
     def id(self, value):
-        self._objectLookup[self._idTag] = value
+        self._objectLookup[self._id_tag] = value
 
     #objectName
     @property
     def objectName(self):
-        return self._objectLookup[self._objectName]
+        return self._objectLookup[self._objectName_tag]
 
     @objectName.setter
     def objectName(self, value):
-        self._objectLookup[self._objectName] = value
+        self._objectLookup[self._objectName_tag] = value
 
     #functions
+    def setValue(self, tag, value):
+        self._objectLookup[tag] = value
+
     def isInstrinsic(self, tag):
-        return ((tag == self._idTag)  or (tag == self._objectName))
+        return ((tag == self._id_tag)  or (tag == self._objectName_tag))
 
     def serialize(self):
         return self._objectLookup
     
     def serializeJson(self):
         return jsonify(self.serialize())
+    
+    @staticmethod
+    def deserializeObject(jsonObj, objectType):
+
+        obj = objectType()
+
+        pLookup = obj.objectPropertyList
+
+        for k in pLookup.keys():
+            obj.setValue(k, commonUtility.dictGetSafe(jsonObj, k))
+
+        return obj

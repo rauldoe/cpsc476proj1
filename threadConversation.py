@@ -1,46 +1,63 @@
 import datetime
 
 from flask import jsonify
+
 from commonUtility import commonUtility
+from objectBase import objectBase
 
-class threadConversation:
-    id = 0
-    forum_id = 0
-    title = ""
-    text1 = ""
-    author = ""
-    timestamp1 = datetime.datetime.now()
+class threadConversation(objectBase):
 
-    def __init__(self, id, forum_id, title, text1, author, timestamp1):
-        self.id = id
-        self.forum_id = forum_id
-        self.title = title
-        self.text1 = text1
-        self.author = author
-        self.timestamp1 = timestamp1
+    def __init__(self):
+        super().__init__()
 
-    def serialize(self):
-        return {
-            'id': self.id, 
-            'forum_id': self.forum_id,
-            'title': self.title,
-            'text1': self.text1,
-            'author': self.author,
-            'timestamp1': self.timestamp1
-        }
-    
-    def serializeJson(self):
-        return jsonify(self.serialize())
+        self.objectLookup[self.forum_id_tag] = None
+        self.objectLookup[self.title_tag] = None
+        self.objectLookup[self.text1_tag] = None
+        self.objectLookup[self.author_tag] = None
+        self.objectLookup[self.timestamp1_tag] = None
+        
+    forum_id_tag = "forum_id"
+    @property
+    def forum_id(self):
+        return self.objectLookup[self.forum_id_tag]
 
-    @staticmethod
-    def deserialize(jsonObj):
+    @forum_id.setter
+    def forum_id(self, value):
+        self.objectLookup[self.forum_id_tag] = value
 
-        id = 0
-        forum_id = commonUtility.dictGetSafe(jsonObj, "forum_id")
-        title = commonUtility.dictGetSafe(jsonObj, "title")
-        text = commonUtility.dictGetSafe(jsonObj, "text")
-        author = commonUtility.dictGetSafe(jsonObj, "author")
-        timestamp1 = commonUtility.dictGetSafe(jsonObj, "timestamp1")
+    title_tag = "title"
+    @property
+    def title(self):
+        return self.objectLookup[self.title_tag]
 
-        return threadConversation(id, forum_id, title, text, author, timestamp1)
+    @title.setter
+    def title(self, value):
+        self.objectLookup[self.title_tag] = value
+
+    text1_tag = "text1"
+    @property
+    def text1(self):
+        return self.objectLookup[self.text1_tag]
+
+    @text1.setter
+    def text1(self, value):
+        self.objectLookup[self.text1_tag] = value
+
+    author_tag = "author"
+    @property
+    def author(self):
+        return self.objectLookup[self.author_tag]
+
+    @author.setter
+    def author(self, value):
+        self.objectLookup[self.author_tag] = value
+
+    timestamp1_tag = "timestamp1"
+    @property
+    def timestamp1(self):
+        return self.objectLookup[self.timestamp1_tag]
+
+    @timestamp1.setter
+    def timestamp1(self, value):
+        self.objectLookup[self.timestamp1_tag] = value
 

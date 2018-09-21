@@ -18,6 +18,8 @@ from threadConversation import threadConversation
 from cpsc476Auth import cpsc476Auth
 from httpUtility import httpUtility
 from commonUtility import commonUtility
+from objectBase import objectBase
+from appUtility import appUtility
 
 forumsUrl = "/forums"
 forumsFromForumIdUrl = forumsUrl + "/<int:forum_id>"
@@ -36,15 +38,21 @@ basic_auth = cpsc476Auth(app)
 def getForums():
 
     ilist = forumList.loadList(dbPath)
-
     return make_response(ilist.serialize(), httpUtility.Ok)
 
 @app.route(forumsUrl, methods=[httpUtility.POST])
 @basic_auth.required
 def createForum():
 
-    #basic_auth.username
-    obj = forum.deserialize(request.json)
+    obj = objectBase.deserializeObject(request.json, forum)
+    obj.creator = basic_auth.username
+
+    query = "SELECT 1 FROM forums WHERE name = '{name}';".format(name=obj.name)
+    isPassed = appUtility.ifExistDoError(dbPath, query, httpUtility.NotFound)
+    if not isPassed:
+        return
+    
+    db.executeInsert(dbPath, obj)
     return make_response(obj.serializeJson(), httpUtility.Created)
 
 @app.route(forumsFromForumIdUrl, methods=[httpUtility.GET])
@@ -60,29 +68,20 @@ def getThreadsByForum(forum_id):
 def createThread(forum_id):
 
     query = "SELECT 1 FROM forums WHERE id = '{forum_id}';".format(forum_id=forum_id)
-    isPassed = commonUtility.ifNotExistDoError(dbPath, query, httpUtility.NotFound)
+    isPassed = appUtility.ifNotExistDoError(dbPath, query, httpUtility.NotFound)
     if not isPassed:
         return
 
-    id = 0
-    obj = threadConversation.deserialize(request.json)
+    obj = objectBase.deserializeObject(request.json, threadConversation)
     obj.forum_id = forum_id
     obj.author = basic_auth.username
     obj.timestamp1 = datetime.datetime.now()
-
-    #INSERT INTO threads(forum_id, title, text1, author, timestamp1) VALUES (1, 'first thread - first forum', 'hey this is great', 'paul', date('now'));
-    #query = "INSERT INTO threads(forum_id, title, text1, author, timestamp1) "\
-    #    + "VALUES ('{forum_id}',  '{title}', '{text}', '{author}', '{timestamp}');".format(forum_id=obj.forum_id, title=obj.title, text=obj.text1, author=obj.author, timestamp=obj.timestamp1)    
-    #conn = db.initDb(dbPath)
-    #id = db.executeReturnId(conn, query)
-    #db.closeDb(conn)
-    #obj.id = id
 
     obj = db.executeInsert(dbPath, obj)
 
     response = make_response(obj.serializeJson(), httpUtility.Created)
 
-    response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url=forumsUrl, forum_id=forum_id, thread_id=id)
+    response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url=forumsUrl, forum_id=forum_id, thread_id=obj.id)
 
     return response
 
@@ -101,7 +100,7 @@ def getPostsByThread(forum_id, thread_id):
 def createPost(forum_id, thread_id):
 
     #basic_auth.username
-    obj = forum.deserialize(request.json)
+    obj = objectBase.deserializeObject(request.json, forum)
     return make_response(obj.serializeJson(), httpUtility.Created)
 
 @app.route(usersUrl, methods=[httpUtility.POST])
