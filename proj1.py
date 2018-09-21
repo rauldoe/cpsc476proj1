@@ -65,16 +65,13 @@ def createThread(forum_id):
     obj.timestamp1 = datetime.datetime.now()
 
     #INSERT INTO threads(forum_id, title, text1, author, timestamp1) VALUES (1, 'first thread - first forum', 'hey this is great', 'paul', date('now'));
-    query = "INSERT INTO threads(forum_id, title, text1, author, timestamp1) "+"VALUES ('{forum_id}',  '{title}', '{text}', '{author}', '{timestamp}');".format(forum_id=obj.forum_id, title=obj.title, text=obj.text1, author=obj.author, timestamp=obj.timestamp1)    
+    query = "INSERT INTO threads(forum_id, title, text1, author, timestamp1) "\
+        + "VALUES ('{forum_id}',  '{title}', '{text}', '{author}', '{timestamp}');".format(forum_id=obj.forum_id, title=obj.title, text=obj.text1, author=obj.author, timestamp=obj.timestamp1)    
     conn = db.initDb(dbPath)
-    db.executeNonQuery(conn, query)
+    thread_id = db.executeReturnId(conn, query)
     db.closeDb(conn)
 
-    query = "select last_insert_rowid() as id;"    
-    conn = db.initDb(dbPath)
-    item = db.executeReturnOne(conn, query)
-    thread_id = item[0]
-    db.closeDb(conn)
+    obj.id = thread_id
 
     response = make_response(obj.serializeJson(), httpUtility.Created)
 
