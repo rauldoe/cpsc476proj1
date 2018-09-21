@@ -33,6 +33,17 @@ class db:
         return cur
 
     @staticmethod
+    def executeIfExist(conn, query):
+        cur = db.execute(conn, query)
+        item = cur.fetchone()
+        cur.close()
+
+        if item is None:
+            return False
+        else:
+            return True
+
+    @staticmethod
     def executeReturnOne(conn, query):
         cur = db.execute(conn, query)
         item = cur.fetchone()
