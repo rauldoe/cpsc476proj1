@@ -1,24 +1,32 @@
 from flask import jsonify
 
-class forum:
-    id = 0
-    name = ""
-    creator = ""
+from objectBase import objectBase
+
+class forum(objectBase):
 
     def __init__(self, id, name, creator):
-        self.id = id
+        super().__init__(id)
+
         self.name = name
         self.creator = creator
 
-    def serialize(self):
-        return {
-            'id': self.id, 
-            'name': self.name,
-            'creator': self.creator
-        }
+    nameTag = "name"
+    @property
+    def name(self):
+        return self.objectLookup[self.nameTag]
+
+    @name.setter
+    def name(self, value):
+        self.objectLookup[self.nameTag] = value
     
-    def serializeJson(self):
-        return jsonify(self.serialize())
+    creatorTag = "creator"
+    @property
+    def creator(self):
+        return self.objectLookup[self.creatorTag]
+
+    @creator.setter
+    def creator(self, value):
+        self.objectLookup[self.creatorTag] = value
 
     @staticmethod
     def deserialize(jsonObj):

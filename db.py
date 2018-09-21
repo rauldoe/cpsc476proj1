@@ -1,6 +1,27 @@
 import sqlite3
 
 class db:
+
+    @staticmethod
+    def executeInsert(dbPath, obj):
+
+        pLookup = obj.objectPropertyList
+        
+        columnList = ', '.join(map(lambda i: i[0], pLookup.keys()))
+        valueList = ', '.join(map(lambda i: "'{val}'".format(val=str(i[1])), pLookup.values()))
+
+        #INSERT INTO threads(forum_id, title, text1, author, timestamp1)
+        #VALUES (1, 'first thread - first forum', 'hey this is great', 'paul', date('now'));
+        query = "INSERT INTO {tableName}({columnList}) VALUES({valueList});".format(tableName=obj.objectName, columnList={columnList}, valueList={valueList})
+
+        conn = db.initDb(dbPath)
+        id = db.executeReturnId(conn, query)
+        db.closeDb(conn)
+
+        obj.id = id
+    
+        return obj
+
     #executeScriptPath("proj1.db", "init.sql")
     @staticmethod
     def executeScriptPath(dbPath, scriptPath):
