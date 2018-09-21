@@ -35,7 +35,10 @@ class db:
     @staticmethod
     def executeReturnOne(conn, query):
         cur = db.execute(conn, query)
-        return cur.fetchone()
+        item = cur.fetchone()
+        cur.close()
+
+        return item
     
     @staticmethod
     def executeReturnList(conn, query):
@@ -44,12 +47,24 @@ class db:
 
     @staticmethod
     def executeNonQuery(conn, query):
-        db.execute(conn, query)
+        cur = db.execute(conn, query)
+        cur.close()
 
+    @staticmethod
+    def executeReturnId(conn, query):
+        cur = conn.cursor()
+        cur.execute(query)
+        conn.commit()
+        id = cur.lastrowid
+        cur.close()
+
+        return id
+    
     @staticmethod
     def executeScript(conn, queryFromScript):
         cur = conn.cursor()
         cur.executescript(queryFromScript)
+        cur.close()
 
     @staticmethod
     def loadFile(filePath):
