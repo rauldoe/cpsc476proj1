@@ -17,6 +17,7 @@ from forumList import forumList
 from threadConversation import threadConversation
 from cpsc476Auth import cpsc476Auth
 from httpUtility import httpUtility
+from commonUtility import commonUtility
 
 forumsUrl = "/forums"
 forumsFromForumIdUrl = forumsUrl + "/<int:forum_id>"
@@ -58,7 +59,12 @@ def getThreadsByForum(forum_id):
 @basic_auth.required
 def createThread(forum_id):
 
-    thread_id = 0
+    query = "SELECT 1 FROM forums WHERE id = '{forum_id}';".format(forum_id=forum_id)
+    isPassed = commonUtility.ifNotExistDoError(dbPath, query, httpUtility.NotFound)
+    if not isPassed:
+        return
+
+    id = 0
     obj = threadConversation.deserialize(request.json)
     obj.forum_id = forum_id
     obj.author = basic_auth.username
@@ -68,14 +74,14 @@ def createThread(forum_id):
     query = "INSERT INTO threads(forum_id, title, text1, author, timestamp1) "\
         + "VALUES ('{forum_id}',  '{title}', '{text}', '{author}', '{timestamp}');".format(forum_id=obj.forum_id, title=obj.title, text=obj.text1, author=obj.author, timestamp=obj.timestamp1)    
     conn = db.initDb(dbPath)
-    thread_id = db.executeReturnId(conn, query)
+    id = db.executeReturnId(conn, query)
     db.closeDb(conn)
 
-    obj.id = thread_id
+    obj.id = id
 
     response = make_response(obj.serializeJson(), httpUtility.Created)
 
-    response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url=forumsUrl, forum_id=forum_id, thread_id=thread_id)
+    response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url=forumsUrl, forum_id=forum_id, thread_id=id)
 
     return response
 
