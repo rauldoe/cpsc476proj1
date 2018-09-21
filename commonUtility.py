@@ -37,5 +37,5 @@ class commonUtility:
             if not doesExist:
                 isPassed = False
                 abort(errorStatus)
-        
+
         return isPassed
