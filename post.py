@@ -1,5 +1,6 @@
 import datetime
 from flask import jsonify
+from commonUtility import commonUtility
 
 class post:
     id = 0
@@ -18,17 +19,21 @@ class post:
 
     def serialize(self):
         return {
-            'id': self.id, 
+            'id': self.id,
             'thread_id': self.thread_id,
             'text1': self.text1,
             'poster': self.poster,
             'timestamp1': self.timestamp1
         }
-    
+
     def serializeJson(self):
         return jsonify(self.serialize())
 
     @staticmethod
     def deserialize(jsonObj):
-        return post(0, jsonObj["thread_id"],jsonObj["text1"],jsonObj["poster"],jsonObj["timestamp1"])
+        thread_id = commonUtility.dictGetSafe(jsonObj, "thread_id")
+        text1 = commonUtility.dictGetSafe(jsonObj, "text1")
+        poster = commonUtility.dictGetSafe(jsonObj, "poster")
+        timestamp1 = commonUtility.dictGetSafe(jsonObj, "timestamp1")
 
+        return post(0, thread_id, text1, poster, timestamp1)

@@ -15,6 +15,7 @@ from db import db
 from forum import forum
 from forumList import forumList
 from threadConversation import threadConversation
+from post import post
 from cpsc476Auth import cpsc476Auth
 from httpUtility import httpUtility
 from commonUtility import commonUtility
@@ -44,6 +45,12 @@ def getForums():
 def createForum():
 
     obj = forum.deserialize(request.json)
+
+    query = "SELECT 1 FROM forums WHERE name = '{name}';".format(name=obj.name)
+    isPassed = commonUtility.ifExistDoError(dbPath, query, httpUtility.Conflict)
+    if not isPassed:
+        return
+
     obj.creator = basic_auth.username
 
     #obj.name
@@ -114,24 +121,30 @@ def getPostsByThread(forum_id, thread_id):
 @basic_auth.required
 def createPost(forum_id, thread_id):
 
-    #basic_auth.username
-    obj = forum.deserialize(request.json)
+    obj = post.deserialize(request.json)
     obj.thread_id=thread_id
     obj.poster = basic_auth.username
     obj.timestamp1 = datetime.datetime.now()
 
+    #SELECT 1 FROM threads
+    #inner join posts on threads.id = posts.thread_id
+    #WHERE posts.forum_id = forum_id AND threads.id = thread_id;
+    query = "SELECT 1 FROM threads WHERE id = {thread_id} AND forum_id = {forum_id};".format(forum_id=forum_id, thread_id=thread_id)
+    isPassed = commonUtility.ifNotExistDoError(dbPath, query, httpUtility.NotFound)
+    if not isPassed:
+        return
+
     query = "INSERT INTO posts(thread_id, text1, poster, timestamp1) "\
         + "VALUES ('{thread_id}',  '{text}', '{poster}', '{timestamp}');".format(thread_id=obj.thread_id, text=obj.text1, poster=obj.poster, timestamp=obj.timestamp1)
     conn = db.initDb(dbPath)
-    forum_id=obj.forum_id
-    thread_id = db.executeReturnId(conn, query)
+    id = db.executeReturnId(conn, query)
     db.closeDb(conn)
 
-    obj.id = thread_id
+    obj.id = id
 
     response = make_response(obj.serializeJson(), httpUtility.Created)
 
-    response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url=forumsUrl, forum_id=forum_id, thread_id=thread_id)
+    #response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url=forumsUrl, forum_id=forum_id, thread_id=thread_id)
 
     return response
 
