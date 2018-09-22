@@ -163,7 +163,7 @@ def changeUserPassword(username):
 
     obj = db.executeUpdate(dbPath, obj, ["username"])
 
-    response = make_response("", httpUtility.Created)
+    response = make_response("", httpUtility.Ok)
 
     return response
 

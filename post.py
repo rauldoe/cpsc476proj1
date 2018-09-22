@@ -47,5 +47,3 @@ class post(objectBase):
     @timestamp.setter
     def timestamp(self, value):
         self.objectLookup[self.timestamp_tag] = value
-
-
