@@ -1,39 +1,49 @@
-import datetime
-from flask import jsonify
-from commonUtility import commonUtility
 
-class post:
-    id = 0
-    thread_id = 0
-    title = ""
-    text1 = ""
-    author = ""
-    timestamp1 = datetime.datetime.now()
+from objectBase import objectBase
 
-    def __init__(self, id, thread_id, text1, poster, timestamp1):
-        self.id = id
-        self.thread_id = thread_id
-        self.text1 = text1
-        self.poster = poster
-        self.timestamp1 = timestamp1
+class post(objectBase):
 
-    def serialize(self):
-        return {
-            'id': self.id,
-            'thread_id': self.thread_id,
-            'text1': self.text1,
-            'poster': self.poster,
-            'timestamp1': self.timestamp1
-        }
 
-    def serializeJson(self):
-        return jsonify(self.serialize())
+    def __init__(self):
+        super().__init__()
 
-    @staticmethod
-    def deserialize(jsonObj):
-        thread_id = commonUtility.dictGetSafe(jsonObj, "thread_id")
-        text1 = commonUtility.dictGetSafe(jsonObj, "text1")
-        poster = commonUtility.dictGetSafe(jsonObj, "poster")
-        timestamp1 = commonUtility.dictGetSafe(jsonObj, "timestamp1")
+        self.objectLookup[self.thread_id_tag] = None
+        self.objectLookup[self.text_tag] = None
+        self.objectLookup[self.poster_tag] = None
+        self.objectLookup[self.timestamp_tag] = None
+    
+    thread_id_tag = "thread_id"
+    @property
+    def thread_id(self):
+        return self.objectLookup[self.thread_id_tag]
 
-        return post(0, thread_id, text1, poster, timestamp1)
+    @thread_id.setter
+    def thread_id(self, value):
+        self.objectLookup[self.thread_id_tag] = value
+
+    text_tag = "text"
+    @property
+    def text(self):
+        return self.objectLookup[self.text_tag]
+
+    @text.setter
+    def text(self, value):
+        self.objectLookup[self.text_tag] = value
+
+    poster_tag = "poster"
+    @property
+    def poster(self):
+        return self.objectLookup[self.poster_tag]
+
+    @poster.setter
+    def poster(self, value):
+        self.objectLookup[self.poster_tag] = value
+        
+    timestamp_tag = "timestamp"
+    @property
+    def timestamp(self):
+        return self.objectLookup[self.timestamp_tag]
+
+    @timestamp.setter
+    def timestamp(self, value):
+        self.objectLookup[self.timestamp_tag] = value
