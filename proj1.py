@@ -31,7 +31,7 @@ forumsFromForumIdThreadIdUrl = forumsFromForumIdUrl + "/<int:thread_id>"
 usersUrl = "/users"
 usersByUsernameUrl = usersUrl + "/<string:username>"
 
-dbPath = "proj1.db"
+dbPath = commonUtility.dbPath
 
 app = Flask(__name__)
 
