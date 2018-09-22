@@ -1,8 +1,4 @@
-import datetime
 
-from flask import jsonify
-
-from commonUtility import commonUtility
 from objectBase import objectBase
 
 class threadConversation(objectBase):
@@ -12,9 +8,9 @@ class threadConversation(objectBase):
 
         self.objectLookup[self.forum_id_tag] = None
         self.objectLookup[self.title_tag] = None
-        self.objectLookup[self.text1_tag] = None
+        self.objectLookup[self.text_tag] = None
         self.objectLookup[self.author_tag] = None
-        self.objectLookup[self.timestamp1_tag] = None
+        self.objectLookup[self.timestamp_tag] = None
         
     forum_id_tag = "forum_id"
     @property
@@ -34,14 +30,14 @@ class threadConversation(objectBase):
     def title(self, value):
         self.objectLookup[self.title_tag] = value
 
-    text1_tag = "text1"
+    text_tag = "text"
     @property
-    def text1(self):
-        return self.objectLookup[self.text1_tag]
+    def text(self):
+        return self.objectLookup[self.text_tag]
 
-    @text1.setter
-    def text1(self, value):
-        self.objectLookup[self.text1_tag] = value
+    @text.setter
+    def text(self, value):
+        self.objectLookup[self.text_tag] = value
 
     author_tag = "author"
     @property
@@ -52,12 +48,12 @@ class threadConversation(objectBase):
     def author(self, value):
         self.objectLookup[self.author_tag] = value
 
-    timestamp1_tag = "timestamp1"
+    timestamp_tag = "timestamp"
     @property
-    def timestamp1(self):
-        return self.objectLookup[self.timestamp1_tag]
+    def timestamp(self):
+        return self.objectLookup[self.timestamp_tag]
 
-    @timestamp1.setter
-    def timestamp1(self, value):
-        self.objectLookup[self.timestamp1_tag] = value
+    @timestamp.setter
+    def timestamp(self, value):
+        self.objectLookup[self.timestamp_tag] = value
 

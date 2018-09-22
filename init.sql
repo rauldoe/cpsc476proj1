@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS posts;
-DROP TABLE IF EXISTS threads;
+DROP TABLE IF EXISTS threadConversations;
 DROP TABLE IF EXISTS forums;
 DROP TABLE IF EXISTS users;
 
@@ -16,13 +16,13 @@ CREATE TABLE forums (
   FOREIGN KEY (creator) REFERENCES users (username)
 );
 
-CREATE TABLE threads (
+CREATE TABLE threadConversations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   forum_id INTEGER NOT NULL,
   title VARCHAR(1000) NOT NULL,
-  text1 VARCHAR(1000) NOT NULL,
+  text VARCHAR(1000) NOT NULL,
   author VARCHAR(250) NOT NULL,
-  timestamp1 DATETIME NOT NULL,
+  timestamp DATETIME NOT NULL,
   FOREIGN KEY (forum_id) REFERENCES forums (id),
   FOREIGN KEY (author) REFERENCES users (username)
 );
@@ -30,9 +30,9 @@ CREATE TABLE threads (
 CREATE TABLE posts (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   thread_id INTEGER NOT NULL,
-  text1 VARCHAR(1000) NOT NULL,
+  text VARCHAR(1000) NOT NULL,
   poster VARCHAR(250) NOT NULL,
-  timestamp1 DATETIME NOT NULL,
+  timestamp DATETIME NOT NULL,
   FOREIGN KEY (thread_id) REFERENCES threads (id),
   FOREIGN KEY (poster) REFERENCES users (username)
 );

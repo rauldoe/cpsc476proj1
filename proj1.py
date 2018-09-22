@@ -9,17 +9,20 @@ from flask import request
 from flask import jsonify
 from flask import make_response
 from flask import current_app
+from flask import abort
+
 from flask_basicauth import BasicAuth
 
 from db import db
 from forum import forum
-from forumList import forumList
 from threadConversation import threadConversation
+from post import post
 from cpsc476Auth import cpsc476Auth
 from httpUtility import httpUtility
 from commonUtility import commonUtility
 from objectBase import objectBase
 from appUtility import appUtility
+from user import user
 
 forumsUrl = "/forums"
 forumsFromForumIdUrl = forumsUrl + "/<int:forum_id>"
@@ -37,8 +40,11 @@ basic_auth = cpsc476Auth(app)
 @app.route(forumsUrl, methods=[httpUtility.GET])
 def getForums():
 
-    ilist = forumList.loadList(dbPath)
-    return make_response(ilist.serialize(), httpUtility.Ok)
+    whereList = {}
+    ilist = appUtility.loadList(dbPath, forum, whereList)
+    response = make_response(ilist.serialize(), httpUtility.Ok)
+    response.headers["Content-Type"] = "application/json"
+    return response
 
 @app.route(forumsUrl, methods=[httpUtility.POST])
 @basic_auth.required
@@ -47,8 +53,7 @@ def createForum():
     obj = objectBase.deserializeObject(request.json, forum)
     obj.creator = basic_auth.username
 
-    query = "SELECT 1 FROM forums WHERE name = '{name}';".format(name=obj.name)
-    isPassed = appUtility.ifExistDoError(dbPath, query, httpUtility.NotFound)
+    isPassed = appUtility.ifExistDoError(dbPath, obj, ["name"], httpUtility.Conflict)
     if not isPassed:
         return
     
@@ -58,81 +63,109 @@ def createForum():
 @app.route(forumsFromForumIdUrl, methods=[httpUtility.GET])
 def getThreadsByForum(forum_id):
 
-    ilist = forumList.test()
-    subList = ilist.find(forum_id)
+    whereList = {"forum_id":forum_id}
+    ilist = appUtility.loadList(dbPath, threadConversation, whereList)
 
-    return make_response(subList.serialize(), httpUtility.Ok)
+    response = make_response(ilist.serialize(), httpUtility.Ok)
+    response.headers["Content-Type"] = "application/json"
+
+    return response
 
 @app.route(forumsFromForumIdUrl, methods=[httpUtility.POST])
 @basic_auth.required
 def createThread(forum_id):
 
-    query = "SELECT 1 FROM forums WHERE id = '{forum_id}';".format(forum_id=forum_id)
-    isPassed = appUtility.ifNotExistDoError(dbPath, query, httpUtility.NotFound)
-    if not isPassed:
-        return
-
     obj = objectBase.deserializeObject(request.json, threadConversation)
     obj.forum_id = forum_id
     obj.author = basic_auth.username
-    obj.timestamp1 = datetime.datetime.now()
+    obj.timestamp = datetime.datetime.now()
+
+    isPassed = appUtility.ifNotExistDoError(dbPath, obj, ["forum_id"], httpUtility.NotFound)
+    if not isPassed:
+        return
 
     obj = db.executeInsert(dbPath, obj)
 
     response = make_response(obj.serializeJson(), httpUtility.Created)
 
-    response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url=forumsUrl, forum_id=forum_id, thread_id=obj.id)
+    response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url=forumsUrl, forum_id=obj.forum_id, thread_id=obj.id)
 
     return response
 
 @app.route(forumsFromForumIdThreadIdUrl, methods=[httpUtility.GET])
 def getPostsByThread(forum_id, thread_id):
 
-    ilist = forumList.test()
-    subList = ilist.find(forum_id)
+    obj = post()
+    obj.thread_id = thread_id
 
-    subList.mList[0].creator = basic_auth.username
+    #TODO: this check requires a join
+    isPassed = appUtility.ifNotExistDoError(dbPath, obj, ["thread_id"], httpUtility.NotFound)
+    if not isPassed:
+        return
 
-    return make_response(subList.serialize(), httpUtility.Ok)
+    #whereList = {"forum_id":forum_id, "thread_id":thread_id}
+    whereList = {"thread_id":thread_id}
+    ilist = appUtility.loadList(dbPath, post, whereList)
+
+    response = make_response(ilist.serialize(), httpUtility.Ok)
+    response.headers["Content-Type"] = "application/json"
+
+    return response
 
 @app.route(forumsFromForumIdThreadIdUrl, methods=[httpUtility.POST])
 @basic_auth.required
 def createPost(forum_id, thread_id):
 
-    #basic_auth.username
-    obj = objectBase.deserializeObject(request.json, forum)
-    return make_response(obj.serializeJson(), httpUtility.Created)
+    obj = objectBase.deserializeObject(request.json, post)
+    obj.thread_id = thread_id
+    obj.author = basic_auth.username
+    obj.timestamp = datetime.datetime.now()
+
+    #TODO: this check requires a join
+    isPassed = appUtility.ifNotExistDoError(dbPath, obj, ["thread_id"], httpUtility.NotFound)
+    if not isPassed:
+        return
+
+    obj = db.executeInsert(dbPath, obj)
+
+    response = make_response(obj.serializeJson(), httpUtility.Created)
+
+    return response
 
 @app.route(usersUrl, methods=[httpUtility.POST])
 def createUser():
 
-    ilist = forumList()
+    obj = objectBase.deserializeObject(request.json, user)
 
-    query = "SELECT id, name, creator FROM {table};".format(table="forums")
-    conn = db.initDb(dbPath)
-    dataList = db.executeReturnList(conn, query)
-    for i in dataList:
-        ilist.appendItem(i["id"], i["name"], i["creator"])
+    isPassed = appUtility.ifExistDoError(dbPath, obj, ["username"], httpUtility.Conflict)
+    if not isPassed:
+        return
 
-    db.closeDb(conn)
+    obj = db.executeInsert(dbPath, obj)
 
-    return make_response(ilist.serialize(), httpUtility.Ok)
+    response = make_response("", httpUtility.Created)
+
+    return response
 
 @app.route(usersByUsernameUrl, methods=[httpUtility.PUT])
 @basic_auth.required
 def changeUserPassword(username):
 
-    ilist = forumList()
+    obj = objectBase.deserializeObject(request.json, user)
+    obj.username = username
 
-    query = "SELECT id, name, creator FROM {table};".format(table="forums")
-    conn = db.initDb(dbPath)
-    dataList = db.executeReturnList(conn, query)
-    for i in dataList:
-        ilist.appendItem(i["id"], i["name"], i["creator"])
+    isPassed = appUtility.ifNotExistDoError(dbPath, obj, ["username"], httpUtility.NotFound)
+    if not isPassed:
+        return
 
-    db.closeDb(conn)
+    if obj.username != basic_auth.username:
+        abort(httpUtility.Conflict)
 
-    return make_response(ilist.serialize(), httpUtility.Ok)
+    obj = db.executeUpdate(dbPath, obj, ["username"])
+
+    response = make_response("", httpUtility.Created)
+
+    return response
 
 @app.errorhandler(httpUtility.NotFound)
 def notFound(error):

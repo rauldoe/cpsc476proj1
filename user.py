@@ -1,27 +1,29 @@
-from flask import jsonify
 
-class user:
-    id = 0
-    username = ""
-    password = ""
+from objectBase import objectBase
 
-    def __init__(self, id, username, password):
-        self.id = id
-        self.username = username
-        self.password = password
+class user(objectBase):
 
-    #TODO: encrypt password
-    def serialize(self):
-        return {
-            'id': self.id, 
-            'username': self.username,
-            'password': self.password
-        }
+
+    def __init__(self):
+        super().__init__()
+
+        self.objectLookup[self.username_tag] = None
+        self.objectLookup[self.password_tag] = None
     
-    def serializeJson(self):
-        return jsonify(self.serialize())
+    username_tag = "username"
+    @property
+    def username(self):
+        return self.objectLookup[self.username_tag]
 
-    @staticmethod
-    def deserialize(jsonObj):
-        return user(0, jsonObj["username"], "")
+    @username.setter
+    def username(self, value):
+        self.objectLookup[self.username_tag] = value
 
+    password_tag = "password"
+    @property
+    def password(self):
+        return self.objectLookup[self.password_tag]
+
+    @password.setter
+    def password(self, value):
+        self.objectLookup[self.password_tag] = value
