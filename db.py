@@ -1,6 +1,55 @@
+    #@staticmethod
+    #def getValue(pLookup, i):
+    #    return commonUtility.getValuefromKeyValueString(pLookup, i)
+
 import sqlite3
 
+from commonUtility import commonUtility
+
 class db:
+
+    @staticmethod
+    def executeInsert(dbPath, obj):
+
+        pLookup = obj.objectPropertyList
+
+        columnList = ', '.join(map(lambda i: i, pLookup))
+        valueList = ', '.join(map(lambda i: "'{val}'".format(val=commonUtility.getValuefromKeyValueString(pLookup, i)), pLookup))
+
+        query = "INSERT INTO {tableName}({columnList}) VALUES({valueList});".format(tableName=obj.objectEntity, columnList=columnList, valueList=valueList)
+        print(query)
+
+        conn = db.initDb(dbPath)
+        id = db.executeReturnId(conn, query)
+        db.closeDb(conn)
+
+        obj.id = id
+    
+        return obj
+
+    #UPDATE table_name
+    #SET column1 = value1, column2 = value2, ...
+    #WHERE condition;
+    @staticmethod
+    def executeUpdate(dbPath, obj, whereList):
+
+        pLookup = obj.objectPropertyList
+        if len(whereList) > 0:
+            whereClause = " WHERE {listString}".format(listString=' AND '.join(map(lambda i: "{col} = '{val}'".format(col=i, val=obj.getValue(i)), whereList)))
+        else:
+            whereClause = ""
+
+        valueSetList = ', '.join(map(lambda i: "{col} = '{val}'".format(col=i, val=commonUtility.getValuefromKeyValueString(pLookup, i)), pLookup))
+
+        query = "UPDATE {tableName} SET {valueSetList}{whereClause};".format(tableName=obj.objectEntity, valueSetList=valueSetList, whereClause=whereClause)
+        print(query)
+
+        conn = db.initDb(dbPath)
+        db.executeNonQuery(conn, query)
+        db.closeDb(conn)
+    
+        return obj
+
     #executeScriptPath("proj1.db", "init.sql")
     @staticmethod
     def executeScriptPath(dbPath, scriptPath):
@@ -11,6 +60,24 @@ class db:
         db.closeDb(conn)
 
     #support functions
+    @staticmethod
+    def getExistQuery(obj, propertyTagList):
+        pLookup = obj.objectPropertyList
+        whereClause = ' AND '.join(map(lambda i: "{col} = '{val}'".format(col=i, val=commonUtility.getValuefromKeyValueString(pLookup, i)), propertyTagList))
+        return "SELECT 1 FROM {entity} WHERE {whereClause};".format(entity=obj.objectEntity, whereClause=whereClause)
+    
+    @staticmethod
+    def getSelectQuery(objType, whereList):
+        obj = objType()
+        pLookup = obj.objectPropertyListWithId
+        columnList = ', '.join(map(lambda i: i, pLookup))
+        if len(whereList) > 0:
+            whereClause = " WHERE {listString}".format(listString=' AND '.join(map(lambda i: "{col} = '{val}'".format(col=i, val=whereList[i]), whereList)))
+        else:
+            whereClause = ""
+
+        return "SELECT {columnList} FROM {entity}{whereClause};".format(columnList=columnList, entity=obj.objectEntity, whereClause=whereClause)
+
     @staticmethod
     def initDb(dbPath):
         conn = sqlite3.connect(
