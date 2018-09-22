@@ -62,7 +62,7 @@ class db:
     #support functions
     @staticmethod
     def getExistQuery(obj, propertyTagList):
-        pLookup = obj.objectPropertyList
+        pLookup = obj.objectPropertyListWithId
         whereClause = ' AND '.join(map(lambda i: "{col} = '{val}'".format(col=i, val=commonUtility.getValuefromKeyValueString(pLookup, i)), propertyTagList))
         return "SELECT 1 FROM {entity} WHERE {whereClause};".format(entity=obj.objectEntity, whereClause=whereClause)
     

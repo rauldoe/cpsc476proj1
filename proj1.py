@@ -37,6 +37,9 @@ app = Flask(__name__)
 
 basic_auth = cpsc476Auth(app)
 
+#def __init__(self):
+#    self.basic_auth.dbPath = dbPath
+
 @app.route(forumsUrl, methods=[httpUtility.GET])
 def getForums():
 
@@ -95,15 +98,14 @@ def createThread(forum_id):
 @app.route(forumsFromForumIdThreadIdUrl, methods=[httpUtility.GET])
 def getPostsByThread(forum_id, thread_id):
 
-    obj = post()
-    obj.thread_id = thread_id
+    checkObj = threadConversation()
+    checkObj.id = thread_id
+    checkObj.forum_id = forum_id
 
-    #TODO: this check requires a join
-    isPassed = appUtility.ifNotExistDoError(dbPath, obj, ["thread_id"], httpUtility.NotFound)
+    isPassed = appUtility.ifNotExistDoError(dbPath, checkObj, ["id", "forum_id"], httpUtility.NotFound)
     if not isPassed:
         return
 
-    #whereList = {"forum_id":forum_id, "thread_id":thread_id}
     whereList = {"thread_id":thread_id}
     ilist = appUtility.loadList(dbPath, post, whereList)
 
@@ -116,16 +118,18 @@ def getPostsByThread(forum_id, thread_id):
 @basic_auth.required
 def createPost(forum_id, thread_id):
 
-    obj = objectBase.deserializeObject(request.json, post)
-    obj.thread_id = thread_id
-    obj.author = basic_auth.username
-    obj.timestamp = datetime.datetime.now()
+    checkObj = threadConversation()
+    checkObj.id = thread_id
+    checkObj.forum_id = forum_id
 
-    #TODO: this check requires a join
-    isPassed = appUtility.ifNotExistDoError(dbPath, obj, ["thread_id"], httpUtility.NotFound)
+    isPassed = appUtility.ifNotExistDoError(dbPath, checkObj, ["id", "forum_id"], httpUtility.NotFound)
     if not isPassed:
         return
 
+    obj = objectBase.deserializeObject(request.json, post)
+    obj.thread_id = thread_id
+    obj.poster = basic_auth.username
+    obj.timestamp = datetime.datetime.now()
     obj = db.executeInsert(dbPath, obj)
 
     response = make_response(obj.serializeJson(), httpUtility.Created)

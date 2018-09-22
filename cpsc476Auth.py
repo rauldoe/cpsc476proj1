@@ -1,19 +1,33 @@
 from flask_basicauth import BasicAuth
 
-#app.config['BASIC_AUTH_USERNAME'] = 'john'
-#app.config['BASIC_AUTH_PASSWORD'] = 'matrix'
+from db import db
+from user import user
+
 #app.config['BASIC_AUTH_FORCE'] = True
 
 class cpsc476Auth(BasicAuth):
-    app = None
-    username = ""
 
     def __init__(self, app=None):
         self.app = app
+        self.username = ""
+        self.dbPath = "proj1.db"
         super().__init__(app)
 
     #override parent function
     def check_credentials(self, username, password):
-        self.username = username
-        self.app.config['BASIC_AUTH_USERNAME'] = username
-        return True
+        obj = user()
+
+        obj.username = username
+        obj.password = password
+
+        query = db.getExistQuery(obj, ["username", "password"])
+        conn = db.initDb(self.dbPath)
+        doesExist = db.executeIfExist(conn, query)
+        db.closeDb(conn)
+
+        if doesExist:
+            self.username = obj.username
+            self.app.config['BASIC_AUTH_USERNAME'] = username
+            return True
+        else:
+            return False
