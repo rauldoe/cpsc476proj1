@@ -1,16 +1,15 @@
 
 from flask import abort
 
-from commonUtility import commonUtility
 from db import db
 from objectList import objectList
 
-class appUtility:
+class helper:
 
     emptyFunc = lambda: True
 
-    @staticmethod    
-    def loadList(dbPath, objectType, whereList):
+    @staticmethod
+    def getList(dbPath, objectType, whereList):
 
         ilist = objectList(objectType)
 
@@ -19,8 +18,8 @@ class appUtility:
         dataList = db.executeReturnList(conn, query)
         for i in dataList:
             obj = ilist.objectType()
-            #ilist.processPerProperty(lambda iobj, j: iobj.setValue(j, i[j]), appUtility.emptyFunc, appUtility.emptyFunc)
-            appUtility.processObjectProp(obj, lambda iobj, j: iobj.setValue(j, i[j]))
+            #ilist.processPerProperty(lambda iobj, j: iobj.setValue(j, i[j]), helper.emptyFunc, helper.emptyFunc)
+            helper.processObjectProp(obj, lambda iobj, j: iobj.setValue(j, i[j]))
             ilist.append(obj)
 
         db.closeDb(conn)
@@ -35,16 +34,16 @@ class appUtility:
 
     @staticmethod
     def ifExistDoError(dbPath, obj, propertyTag, errorStatus):
-        return appUtility.checkIfExistObj(dbPath, obj, propertyTag, errorStatus, 0)
+        return helper.checkIfExistObj(dbPath, obj, propertyTag, errorStatus, 0)
 
     @staticmethod
     def ifNotExistDoError(dbPath, obj, propertyTag, errorStatus):
-        return appUtility.checkIfExistObj(dbPath, obj, propertyTag, errorStatus, 1)
+        return helper.checkIfExistObj(dbPath, obj, propertyTag, errorStatus, 1)
 
     @staticmethod
     def checkIfExistObj(dbPath, obj, propertyTag, errorStatus, statusWhenExist):
         query = db.getExistQuery(obj, propertyTag)
-        return appUtility.checkIfExist(dbPath, query, errorStatus, statusWhenExist)
+        return helper.checkIfExist(dbPath, query, errorStatus, statusWhenExist)
 
     @staticmethod
     def checkIfExist(dbPath, query, errorStatus, statusWhenExist):
@@ -63,5 +62,5 @@ class appUtility:
             if not doesExist:
                 isPassed = False
                 abort(errorStatus)
-        
+
         return isPassed

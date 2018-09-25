@@ -1,11 +1,16 @@
 
 from flask import jsonify
 
-from commonUtility import commonUtility
-
 class objectBase:
     _id_tag = "id"
     _objectName_tag = "objectName"
+
+    @staticmethod
+    def dictGetSafe(dict, key):
+        if key in dict:
+            return dict[key]
+        else:
+            return None
 
     def __init__(self):
         self._objectLookup = {}
@@ -79,10 +84,10 @@ class objectBase:
 
     def serializeItem(self):
         return self.objectPropertyListWithId
-    
+
     def serializeJson(self):
         return jsonify(self.serializeItem())
-    
+
     @staticmethod
     def deserializeObject(jsonObj, objectType):
 
@@ -91,6 +96,6 @@ class objectBase:
         pLookup = obj.objectPropertyList
 
         for k in pLookup.keys():
-            obj.setValue(k, commonUtility.dictGetSafe(jsonObj, k))
+            obj.setValue(k, objectBase.dictGetSafe(jsonObj, k))
 
         return obj

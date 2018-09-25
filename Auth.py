@@ -5,7 +5,7 @@ from user import user
 
 #app.config['BASIC_AUTH_FORCE'] = True
 
-class cpsc476Auth(BasicAuth):
+class Auth(BasicAuth):
 
     def __init__(self, app=None):
         self.app = app
