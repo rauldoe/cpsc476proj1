@@ -2,7 +2,7 @@
 from flask import abort, jsonify
 import json
 
-from db import db
+from dbhelper import dbhelper
 
 class helper:
 
@@ -19,16 +19,15 @@ class helper:
 
         ilist = helper(objectType)
 
-        query = db.getSelectQuery(objectType, whereList)
-        conn = db.initDb(dbPath)
-        dataList = db.executeReturnList(conn, query)
+        query = dbhelper.getSelectQuery(objectType, whereList)
+        conn = dbhelper.initDb(dbPath)
+        dataList = dbhelper.executeReturnList(conn, query)
         for i in dataList:
             obj = ilist.objectType()
-            #ilist.processPerProperty(lambda iobj, j: iobj.setValue(j, i[j]), helper.emptyFunc, helper.emptyFunc)
             helper.processObjectProp(obj, lambda iobj, j: iobj.setValue(j, i[j]))
             ilist.append(obj)
 
-        db.closeDb(conn)
+        dbhelper.closeDb(conn)
 
         return ilist
 
@@ -39,26 +38,23 @@ class helper:
             func(obj, i)
 
     @staticmethod
-    def ifExistDoError(dbPath, obj, propertyTag, errorStatus):
-        return helper.checkIfExistObj(dbPath, obj, propertyTag, errorStatus, 0)
+    def ifexist(dbPath, obj, propertyTag, errorStatus):
+        query = dbhelper.getExistQuery(obj, propertyTag)
+        return helper.checkIfExist(dbPath, query, errorStatus, 0)
 
     @staticmethod
-    def ifNotExistDoError(dbPath, obj, propertyTag, errorStatus):
-        return helper.checkIfExistObj(dbPath, obj, propertyTag, errorStatus, 1)
-
-    @staticmethod
-    def checkIfExistObj(dbPath, obj, propertyTag, errorStatus, statusWhenExist):
-        query = db.getExistQuery(obj, propertyTag)
-        return helper.checkIfExist(dbPath, query, errorStatus, statusWhenExist)
+    def ifnotexist(dbPath, obj, propertyTag, errorStatus):
+        query = dbhelper.getExistQuery(obj, propertyTag)
+        return helper.checkIfExist(dbPath, query, errorStatus, 1)
 
     @staticmethod
     def checkIfExist(dbPath, query, errorStatus, statusWhenExist):
 
         isPassed = True
 
-        conn = db.initDb(dbPath)
-        doesExist = db.executeIfExist(conn, query)
-        db.closeDb(conn)
+        conn = dbhelper.initDb(dbPath)
+        doesExist = dbhelper.executeIfExist(conn, query)
+        dbhelper.closeDb(conn)
 
         if statusWhenExist == 0:
             if doesExist:

@@ -1,6 +1,6 @@
 from flask_basicauth import BasicAuth
 
-from db import db
+from dbhelper import dbhelper
 from user import user
 
 #app.config['BASIC_AUTH_FORCE'] = True
@@ -20,10 +20,10 @@ class Auth(BasicAuth):
         obj.username = username
         obj.password = password
 
-        query = db.getExistQuery(obj, ["username", "password"])
-        conn = db.initDb(self.dbPath)
-        doesExist = db.executeIfExist(conn, query)
-        db.closeDb(conn)
+        query = dbhelper.getExistQuery(obj, ["username", "password"])
+        conn = dbhelper.initDb(self.dbPath)
+        doesExist = dbhelper.executeIfExist(conn, query)
+        dbhelper.closeDb(conn)
 
         if doesExist:
             self.username = obj.username

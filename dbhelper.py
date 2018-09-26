@@ -1,7 +1,7 @@
 
 import sqlite3
 
-class db:
+class dbhelper:
 
     @staticmethod
     def getValuefromKeyValueString(dict, key):
@@ -18,22 +18,19 @@ class db:
         pLookup = obj.objectPropertyList
 
         columnList = ', '.join(map(lambda i: i, pLookup))
-        valueList = ', '.join(map(lambda i: "'{val}'".format(val=db.getValuefromKeyValueString(pLookup, i)), pLookup))
+        valueList = ', '.join(map(lambda i: "'{val}'".format(val=dbhelper.getValuefromKeyValueString(pLookup, i)), pLookup))
 
         query = "INSERT INTO {tableName}({columnList}) VALUES({valueList});".format(tableName=obj.objectEntity, columnList=columnList, valueList=valueList)
         print(query)
 
-        conn = db.initDb(dbPath)
-        id = db.executeReturnId(conn, query)
-        db.closeDb(conn)
+        conn = dbhelper.initDb(dbPath)
+        id = dbhelper.executeReturnId(conn, query)
+        dbhelper.closeDb(conn)
 
         obj.id = id
 
         return obj
 
-    #UPDATE table_name
-    #SET column1 = value1, column2 = value2, ...
-    #WHERE condition;
     @staticmethod
     def update(dbPath, obj, whereList):
 
@@ -43,31 +40,29 @@ class db:
         else:
             whereClause = ""
 
-        valueSetList = ', '.join(map(lambda i: "{col} = '{val}'".format(col=i, val=db.getValuefromKeyValueString(pLookup, i)), pLookup))
+        valueSetList = ', '.join(map(lambda i: "{col} = '{val}'".format(col=i, val=dbhelper.getValuefromKeyValueString(pLookup, i)), pLookup))
 
         query = "UPDATE {tableName} SET {valueSetList}{whereClause};".format(tableName=obj.objectEntity, valueSetList=valueSetList, whereClause=whereClause)
         print(query)
 
-        conn = db.initDb(dbPath)
-        db.executeNonQuery(conn, query)
-        db.closeDb(conn)
+        conn = dbhelper.initDb(dbPath)
+        dbhelper.executeNonQuery(conn, query)
+        dbhelper.closeDb(conn)
 
         return obj
 
-    #executeScriptPath("proj1.db", "init.sql")
     @staticmethod
     def executeScriptPath(dbPath, scriptPath):
 
-        conn = db.initDb(dbPath)
-        script = db.loadFile(scriptPath)
-        db.executeScript(conn, script)
-        db.closeDb(conn)
+        conn = dbhelper.initDb(dbPath)
+        script = dbhelper.loadFile(scriptPath)
+        dbhelper.executeScript(conn, script)
+        dbhelper.closeDb(conn)
 
-    #support functions
     @staticmethod
     def getExistQuery(obj, propertyTagList):
         pLookup = obj.objectPropertyListWithId
-        whereClause = ' AND '.join(map(lambda i: "{col} = '{val}'".format(col=i, val=db.getValuefromKeyValueString(pLookup, i)), propertyTagList))
+        whereClause = ' AND '.join(map(lambda i: "{col} = '{val}'".format(col=i, val=dbhelper.getValuefromKeyValueString(pLookup, i)), propertyTagList))
         return "SELECT 1 FROM {entity} WHERE {whereClause};".format(entity=obj.objectEntity, whereClause=whereClause)
 
     @staticmethod
@@ -105,7 +100,7 @@ class db:
 
     @staticmethod
     def executeIfExist(conn, query):
-        cur = db.execute(conn, query)
+        cur = dbhelper.execute(conn, query)
         item = cur.fetchone()
         cur.close()
 
@@ -116,7 +111,7 @@ class db:
 
     @staticmethod
     def executeReturnOne(conn, query):
-        cur = db.execute(conn, query)
+        cur = dbhelper.execute(conn, query)
         item = cur.fetchone()
         cur.close()
 
@@ -124,12 +119,12 @@ class db:
 
     @staticmethod
     def executeReturnList(conn, query):
-        cur = db.execute(conn, query)
+        cur = dbhelper.execute(conn, query)
         return cur.fetchall()
 
     @staticmethod
     def executeNonQuery(conn, query):
-        cur = db.execute(conn, query)
+        cur = dbhelper.execute(conn, query)
         cur.close()
 
     @staticmethod

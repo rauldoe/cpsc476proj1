@@ -13,7 +13,7 @@ from flask import abort
 
 from flask_basicauth import BasicAuth
 
-from db import db
+from dbhelper import dbhelper
 from forum import forum
 from thread import thread
 from post import post
@@ -43,11 +43,11 @@ def createForum():
     obj = forum.deserializeObject(request.json, forum)
     obj.creator = basic_auth.username
 
-    isPassed = helper.ifExistDoError(dbPath, obj, ["name"], 409)
-    if not isPassed:
+    good = helper.ifexist(dbPath, obj, ["name"], 409)
+    if not good:
         return
 
-    db.insert(dbPath, obj)
+    dbhelper.insert(dbPath, obj)
     return make_response(obj.serializeJson(), 201)
 
 @app.route("/forums/<int:forum_id>", methods=['GET'])
@@ -70,11 +70,11 @@ def createThread(forum_id):
     obj.author = basic_auth.username
     obj.timestamp = datetime.datetime.now()
 
-    isPassed = helper.ifNotExistDoError(dbPath, obj, ["forum_id"], 404)
-    if not isPassed:
+    good = helper.ifnotexist(dbPath, obj, ["forum_id"], 404)
+    if not good:
         return
 
-    obj = db.insert(dbPath, obj)
+    obj = dbhelper.insert(dbPath, obj)
 
     response = make_response(obj.serializeJson(), 201)
 
@@ -89,8 +89,8 @@ def getPostsByThread(forum_id, thread_id):
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
-    isPassed = helper.ifNotExistDoError(dbPath, checkObj, ["id", "forum_id"], 404)
-    if not isPassed:
+    good = helper.ifnotexist(dbPath, checkObj, ["id", "forum_id"], 404)
+    if not good:
         return
 
     whereList = {"thread_id":thread_id}
@@ -109,15 +109,15 @@ def createPost(forum_id, thread_id):
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
-    isPassed = helper.ifNotExistDoError(dbPath, checkObj, ["id", "forum_id"], 404)
-    if not isPassed:
+    good = helper.ifnotexist(dbPath, checkObj, ["id", "forum_id"], 404)
+    if not good:
         return
 
     obj = post.deserializeObject(request.json, post)
     obj.thread_id = thread_id
     obj.poster = basic_auth.username
     obj.timestamp = datetime.datetime.now()
-    obj = db.insert(dbPath, obj)
+    obj = dbhelper.insert(dbPath, obj)
 
     response = make_response(obj.serializeJson(), 201)
 
@@ -128,11 +128,11 @@ def createUser():
 
     obj = user.deserializeObject(request.json, user)
 
-    isPassed = helper.ifExistDoError(dbPath, obj, ["username"], 409)
-    if not isPassed:
+    good = helper.ifexist(dbPath, obj, ["username"], 409)
+    if not good:
         return
 
-    obj = db.insert(dbPath, obj)
+    obj = dbhelper.insert(dbPath, obj)
 
     response = make_response("", 201)
 
@@ -145,14 +145,14 @@ def changeUserPassword(username):
     obj = user.deserializeObject(request.json, user)
     obj.username = username
 
-    isPassed = helper.ifNotExistDoError(dbPath, obj, ["username"], 404)
-    if not isPassed:
+    good = helper.ifnotexist(dbPath, obj, ["username"], 404)
+    if not good:
         return
 
     if obj.username != basic_auth.username:
         abort(409)
 
-    obj = db.update(dbPath, obj, ["username"])
+    obj = dbhelper.update(dbPath, obj, ["username"])
 
     response = make_response("", 200)
 
