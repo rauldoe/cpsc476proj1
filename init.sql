@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username VARCHAR(250) NOT NULL,
+  username VARCHAR(250) UNIQUE NOT NULL,
   password VARCHAR(250) NOT NULL
 );
 
@@ -33,6 +33,6 @@ CREATE TABLE posts (
   text VARCHAR(1000) NOT NULL,
   poster VARCHAR(250) NOT NULL,
   timestamp DATETIME NOT NULL,
-  FOREIGN KEY (thread_id) REFERENCES threads (id),
+  FOREIGN KEY (thread_id) REFERENCES threadConversations (id),
   FOREIGN KEY (poster) REFERENCES users (username)
 );

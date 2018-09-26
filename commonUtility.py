@@ -1,6 +1,8 @@
 
 class commonUtility:
 
+    dbPath = "proj1.db"
+
     @staticmethod
     def getValuefromKeyValueString(dict, key):
         if key is None:
