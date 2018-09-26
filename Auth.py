@@ -10,7 +10,7 @@ class Auth(BasicAuth):
     def __init__(self, app=None):
         self.app = app
         self.username = ""
-        self.dbPath = "proj1.db"
+        self.dbPath = "proj.db"
         super().__init__(app)
 
     #override parent function

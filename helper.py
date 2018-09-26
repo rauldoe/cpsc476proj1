@@ -1,17 +1,23 @@
 
-from flask import abort
+from flask import abort, jsonify
+import json
 
 from db import db
-from objectList import objectList
 
 class helper:
 
+    def __init__(self, objectType):
+        obj = objectType()
+        self.objectType = obj.objectType
+        self.objectName = obj.objectName
+        self.mList = []
+        
     emptyFunc = lambda: True
 
     @staticmethod
     def getList(dbPath, objectType, whereList):
 
-        ilist = objectList(objectType)
+        ilist = helper(objectType)
 
         query = db.getSelectQuery(objectType, whereList)
         conn = db.initDb(dbPath)
@@ -64,3 +70,26 @@ class helper:
                 abort(errorStatus)
 
         return isPassed
+
+    def append(self, item):
+        self.mList.append(item)
+
+    def serialize(self):
+        return json.dumps([i.serializeItem() for i in self.mList])
+
+    def find(self, id):
+        subList = helper(self.objectType)
+        for i in iter(self.mList):
+            if i.id == id:
+                subList.append(i)
+        return subList
+    
+    def process(self, listFunc, preFunc, postFunc):
+        preFunc()
+        for i in self.mList:
+            listFunc(i)
+        postFunc()
+
+    def processPerProperty(self, propFunc, preFunc, postFunc):
+        listFunc = lambda i: i.process(propFunc)
+        self.process(listFunc, preFunc, postFunc)

@@ -13,7 +13,7 @@ class db:
             return dict[key]
 
     @staticmethod
-    def executeInsert(dbPath, obj):
+    def insert(dbPath, obj):
 
         pLookup = obj.objectPropertyList
 
@@ -35,7 +35,7 @@ class db:
     #SET column1 = value1, column2 = value2, ...
     #WHERE condition;
     @staticmethod
-    def executeUpdate(dbPath, obj, whereList):
+    def update(dbPath, obj, whereList):
 
         pLookup = obj.objectPropertyList
         if len(whereList) > 0:

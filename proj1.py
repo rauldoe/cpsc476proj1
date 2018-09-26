@@ -15,27 +15,19 @@ from flask_basicauth import BasicAuth
 
 from db import db
 from forum import forum
-from threadConversation import threadConversation
+from thread import thread
 from post import post
 from Auth import Auth
-from objectBase import objectBase
 from helper import helper
 from user import user
 
-forumsUrl = "/forums"
-forumsFromForumIdUrl = forumsUrl + "/<int:forum_id>"
-forumsFromForumIdThreadIdUrl = forumsFromForumIdUrl + "/<int:thread_id>"
-
-usersUrl = "/users"
-usersByUsernameUrl = usersUrl + "/<string:username>"
-
-dbPath = "proj1.db"
+dbPath = "proj.db"
 
 app = Flask(__name__)
 
 basic_auth = Auth(app)
 
-@app.route(forumsUrl, methods=['GET'])
+@app.route("/forums", methods=['GET'])
 def getForums():
 
     whereList = {}
@@ -44,36 +36,36 @@ def getForums():
     response.headers["Content-Type"] = "application/json"
     return response
 
-@app.route(forumsUrl, methods=['POST'])
+@app.route("/forums", methods=['POST'])
 @basic_auth.required
 def createForum():
 
-    obj = objectBase.deserializeObject(request.json, forum)
+    obj = forum.deserializeObject(request.json, forum)
     obj.creator = basic_auth.username
 
     isPassed = helper.ifExistDoError(dbPath, obj, ["name"], 409)
     if not isPassed:
         return
 
-    db.executeInsert(dbPath, obj)
+    db.insert(dbPath, obj)
     return make_response(obj.serializeJson(), 201)
 
-@app.route(forumsFromForumIdUrl, methods=['GET'])
+@app.route("/forums/<int:forum_id>", methods=['GET'])
 def getThreadsByForum(forum_id):
 
     whereList = {"forum_id":forum_id}
-    ilist = helper.getList(dbPath, threadConversation, whereList)
+    ilist = helper.getList(dbPath, thread, whereList)
 
     response = make_response(ilist.serialize(), 200)
     response.headers["Content-Type"] = "application/json"
 
     return response
 
-@app.route(forumsFromForumIdUrl, methods=['POST'])
+@app.route("/forums/<int:forum_id>", methods=['POST'])
 @basic_auth.required
 def createThread(forum_id):
 
-    obj = objectBase.deserializeObject(request.json, threadConversation)
+    obj = thread.deserializeObject(request.json, thread)
     obj.forum_id = forum_id
     obj.author = basic_auth.username
     obj.timestamp = datetime.datetime.now()
@@ -82,18 +74,18 @@ def createThread(forum_id):
     if not isPassed:
         return
 
-    obj = db.executeInsert(dbPath, obj)
+    obj = db.insert(dbPath, obj)
 
     response = make_response(obj.serializeJson(), 201)
 
-    response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url=forumsUrl, forum_id=obj.forum_id, thread_id=obj.id)
+    response.headers["Location"] = "{url}/{forum_id}/{thread_id}".format(url="/forums", forum_id=obj.forum_id, thread_id=obj.id)
 
     return response
 
-@app.route(forumsFromForumIdThreadIdUrl, methods=['GET'])
+@app.route("/forums/<int:forum_id>/<int:thread_id>", methods=['GET'])
 def getPostsByThread(forum_id, thread_id):
 
-    checkObj = threadConversation()
+    checkObj = thread()
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
@@ -109,11 +101,11 @@ def getPostsByThread(forum_id, thread_id):
 
     return response
 
-@app.route(forumsFromForumIdThreadIdUrl, methods=['POST'])
+@app.route("/forums/<int:forum_id>/<int:thread_id>", methods=['POST'])
 @basic_auth.required
 def createPost(forum_id, thread_id):
 
-    checkObj = threadConversation()
+    checkObj = thread()
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
@@ -121,36 +113,36 @@ def createPost(forum_id, thread_id):
     if not isPassed:
         return
 
-    obj = objectBase.deserializeObject(request.json, post)
+    obj = post.deserializeObject(request.json, post)
     obj.thread_id = thread_id
     obj.poster = basic_auth.username
     obj.timestamp = datetime.datetime.now()
-    obj = db.executeInsert(dbPath, obj)
+    obj = db.insert(dbPath, obj)
 
     response = make_response(obj.serializeJson(), 201)
 
     return response
 
-@app.route(usersUrl, methods=['POST'])
+@app.route("/users", methods=['POST'])
 def createUser():
 
-    obj = objectBase.deserializeObject(request.json, user)
+    obj = user.deserializeObject(request.json, user)
 
     isPassed = helper.ifExistDoError(dbPath, obj, ["username"], 409)
     if not isPassed:
         return
 
-    obj = db.executeInsert(dbPath, obj)
+    obj = db.insert(dbPath, obj)
 
     response = make_response("", 201)
 
     return response
 
-@app.route(usersByUsernameUrl, methods=['PUT'])
+@app.route("/users/<string:username>", methods=['PUT'])
 @basic_auth.required
 def changeUserPassword(username):
 
-    obj = objectBase.deserializeObject(request.json, user)
+    obj = user.deserializeObject(request.json, user)
     obj.username = username
 
     isPassed = helper.ifNotExistDoError(dbPath, obj, ["username"], 404)
@@ -160,7 +152,7 @@ def changeUserPassword(username):
     if obj.username != basic_auth.username:
         abort(409)
 
-    obj = db.executeUpdate(dbPath, obj, ["username"])
+    obj = db.update(dbPath, obj, ["username"])
 
     response = make_response("", 200)
 

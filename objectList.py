@@ -2,7 +2,7 @@ import json
 
 from objectBase import objectBase
 
-class objectList:
+class objectList1:
 
     def __init__(self, objectType):
         obj = objectType()
@@ -17,7 +17,7 @@ class objectList:
         return json.dumps([i.serializeItem() for i in self.mList])
 
     def find(self, id):
-        subList = objectList(self.objectType)
+        subList = objectList1(self.objectType)
         for i in iter(self.mList):
             if i.id == id:
                 subList.append(i)

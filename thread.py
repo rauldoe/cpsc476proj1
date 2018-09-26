@@ -1,8 +1,7 @@
 
 from flask import jsonify
 
-class user:
-
+class thread:
 
     def __init__(self):
         self._objectLookup = {}
@@ -11,26 +10,56 @@ class user:
         self._objectType = self.__class__
         self.id = None
 
-        self.objectLookup[self.username_tag] = None
-        self.objectLookup[self.password_tag] = None
-    
-    username_tag = "username"
+        self.objectLookup[self.forum_id_tag] = None
+        self.objectLookup[self.title_tag] = None
+        self.objectLookup[self.text_tag] = None
+        self.objectLookup[self.author_tag] = None
+        self.objectLookup[self.timestamp_tag] = None
+        
+    forum_id_tag = "forum_id"
     @property
-    def username(self):
-        return self.objectLookup[self.username_tag]
+    def forum_id(self):
+        return self.objectLookup[self.forum_id_tag]
 
-    @username.setter
-    def username(self, value):
-        self.objectLookup[self.username_tag] = value
+    @forum_id.setter
+    def forum_id(self, value):
+        self.objectLookup[self.forum_id_tag] = value
 
-    password_tag = "password"
+    title_tag = "title"
     @property
-    def password(self):
-        return self.objectLookup[self.password_tag]
+    def title(self):
+        return self.objectLookup[self.title_tag]
 
-    @password.setter
-    def password(self, value):
-        self.objectLookup[self.password_tag] = value
+    @title.setter
+    def title(self, value):
+        self.objectLookup[self.title_tag] = value
+
+    text_tag = "text"
+    @property
+    def text(self):
+        return self.objectLookup[self.text_tag]
+
+    @text.setter
+    def text(self, value):
+        self.objectLookup[self.text_tag] = value
+
+    author_tag = "author"
+    @property
+    def author(self):
+        return self.objectLookup[self.author_tag]
+
+    @author.setter
+    def author(self, value):
+        self.objectLookup[self.author_tag] = value
+
+    timestamp_tag = "timestamp"
+    @property
+    def timestamp(self):
+        return self.objectLookup[self.timestamp_tag]
+
+    @timestamp.setter
+    def timestamp(self, value):
+        self.objectLookup[self.timestamp_tag] = value
 
     _id_tag = "id"
     _objectName_tag = "objectName"
@@ -119,6 +148,6 @@ class user:
         pLookup = obj.objectPropertyList
 
         for k in pLookup.keys():
-            obj.setValue(k, user.dictGetSafe(jsonObj, k))
+            obj.setValue(k, thread.dictGetSafe(jsonObj, k))
 
         return obj

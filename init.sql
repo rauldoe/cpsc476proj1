@@ -16,7 +16,7 @@ CREATE TABLE forums (
   FOREIGN KEY (creator) REFERENCES users (username)
 );
 
-CREATE TABLE threadConversations (
+CREATE TABLE threads (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   forum_id INTEGER NOT NULL,
   title VARCHAR(1000) NOT NULL,
