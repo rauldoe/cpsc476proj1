@@ -15,7 +15,7 @@ INSERT INTO threads(forum_id, title, text, author, timestamp) VALUES (2, 'try on
 INSERT INTO threads(forum_id, title, text, author, timestamp) VALUES (2, 'again a try hope it works', 'how to do scrum meeting', 'yashdeep', date('now'));
 INSERT INTO threads(forum_id, title, text, author, timestamp) VALUES (2, 'what to do next', 'just take rest and enjoy', 'david', date('now'));
 
-INSERT INTO posts(thread_id, text, poster, timestamp) VALUES (1, 'i hope this post works', 'david', date('now'));
-INSERT INTO posts(thread_id, text, poster, timestamp) VALUES (1, 'lets give it another try', 'david', date('now'));
-INSERT INTO posts(thread_id, text, poster, timestamp) VALUES (1, 'i know what you mean it should work', 'yashdeep', date('now'));
-INSERT INTO posts(thread_id, text, poster, timestamp) VALUES (1, 'i am not sure though', 'yashdeep', date('now'));
+-- INSERT INTO posts(thread_id, text, poster, timestamp) VALUES (1, 'i hope this post works', 'david', date('now'));
+-- INSERT INTO posts(thread_id, text, poster, timestamp) VALUES (1, 'lets give it another try', 'david', date('now'));
+-- INSERT INTO posts(thread_id, text, poster, timestamp) VALUES (1, 'i know what you mean it should work', 'yashdeep', date('now'));
+-- INSERT INTO posts(thread_id, text, poster, timestamp) VALUES (1, 'i am not sure though', 'yashdeep', date('now'));

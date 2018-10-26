@@ -89,7 +89,7 @@ def getPostsByThread(forum_id, thread_id):
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
-    good = helper.ifnotexist(dbPath, checkObj, ["id", "forum_id"], 404)
+    good = helper.ifnotexist(getDbPath(thread_id), checkObj, ["id", "forum_id"], 404)
     if not good:
         return
 
@@ -109,7 +109,7 @@ def createPost(forum_id, thread_id):
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
-    good = helper.ifnotexist(dbPath, checkObj, ["id", "forum_id"], 404)
+    good = helper.ifnotexist(getDbPath(thread_id), checkObj, ["id", "forum_id"], 404)
     if not good:
         return
 
@@ -161,6 +161,9 @@ def changeUserPassword(username):
 @app.errorhandler(404)
 def notFound(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
+
+def getDbPath(threadId):
+    return "post" + str(threadId%3)
 
 if __name__ == '__main__':
     app.run(debug=True)

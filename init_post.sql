@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS posts;
+
+CREATE TABLE posts (
+  id GUID,
+  thread_id INTEGER NOT NULL,
+  text VARCHAR(1000) NOT NULL,
+  poster VARCHAR(250) NOT NULL,
+  timestamp DATETIME NOT NULL
+);
