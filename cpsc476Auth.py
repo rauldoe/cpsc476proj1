@@ -2,7 +2,7 @@ from flask_basicauth import BasicAuth
 
 from db import db
 from user import user
-from commonUtility import commonUtility
+from infrastructure import infrastructure
 
 #app.config['BASIC_AUTH_FORCE'] = True
 
@@ -11,7 +11,7 @@ class cpsc476Auth(BasicAuth):
     def __init__(self, app=None):
         self.app = app
         self.username = ""
-        self.dbPath = commonUtility.dbPath
+        self.dbPath = infrastructure.getDbCommon()
         super().__init__(app)
 
     #override parent function

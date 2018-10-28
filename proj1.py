@@ -23,6 +23,7 @@ from commonUtility import commonUtility
 from objectBase import objectBase
 from appUtility import appUtility
 from user import user
+from infrastructure import infrastructure
 
 forumsUrl = "/forums"
 forumsFromForumIdUrl = forumsUrl + "/<int:forum_id>"
@@ -31,11 +32,11 @@ forumsFromForumIdThreadIdUrl = forumsFromForumIdUrl + "/<int:thread_id>"
 usersUrl = "/users"
 usersByUsernameUrl = usersUrl + "/<string:username>"
 
-dbPath = commonUtility.dbPath
-
 app = Flask(__name__)
 
 basic_auth = cpsc476Auth(app)
+
+dbPath = infrastructure.getDbCommon()
 
 #def __init__(self):
 #    self.basic_auth.dbPath = dbPath
@@ -98,16 +99,17 @@ def createThread(forum_id):
 @app.route(forumsFromForumIdThreadIdUrl, methods=[httpUtility.GET])
 def getPostsByThread(forum_id, thread_id):
 
+    myDbPath = infrastructure.getDb(thread_id)
     checkObj = threadConversation()
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
-    isPassed = appUtility.ifNotExistDoError(dbPath, checkObj, ["id", "forum_id"], httpUtility.NotFound)
+    isPassed = appUtility.ifNotExistDoError(myDbPath, checkObj, ["id", "forum_id"], httpUtility.NotFound)
     if not isPassed:
         return
 
     whereList = {"thread_id":thread_id}
-    ilist = appUtility.loadList(dbPath, post, whereList)
+    ilist = appUtility.loadList(myDbPath, post, whereList)
 
     response = make_response(ilist.serialize(), httpUtility.Ok)
     response.headers["Content-Type"] = "application/json"
@@ -118,11 +120,12 @@ def getPostsByThread(forum_id, thread_id):
 @basic_auth.required
 def createPost(forum_id, thread_id):
 
+    myDbPath = infrastructure.getDb(thread_id)
     checkObj = threadConversation()
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
-    isPassed = appUtility.ifNotExistDoError(dbPath, checkObj, ["id", "forum_id"], httpUtility.NotFound)
+    isPassed = appUtility.ifNotExistDoError(myDbPath, checkObj, ["id", "forum_id"], httpUtility.NotFound)
     if not isPassed:
         return
 
@@ -130,7 +133,7 @@ def createPost(forum_id, thread_id):
     obj.thread_id = thread_id
     obj.poster = basic_auth.username
     obj.timestamp = datetime.datetime.now()
-    obj = db.executeInsert(dbPath, obj)
+    obj = db.executeInsert(myDbPath, obj)
 
     response = make_response(obj.serializeJson(), httpUtility.Created)
 
