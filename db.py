@@ -1,12 +1,16 @@
-    #@staticmethod
-    #def getValue(pLookup, i):
-    #    return commonUtility.getValuefromKeyValueString(pLookup, i)
 
 import sqlite3
+import uuid
 
 from commonUtility import commonUtility
 
 class db:
+
+    @staticmethod
+    def executeInsertWithQuery(conn, insertQuery, data):
+        #data = (uuid.uuid4(), 'foo')
+        #conn.execute('INSERT INTO test VALUES (?,?)', data)
+        conn.execute(insertQuery, data)
 
     @staticmethod
     def executeInsert(dbPath, obj):
@@ -50,15 +54,6 @@ class db:
     
         return obj
 
-    #executeScriptPath("proj1.db", "init.sql")
-    @staticmethod
-    def executeScriptPath(dbPath, scriptPath):
-
-        conn = db.initDb(dbPath)
-        script = db.loadFile(scriptPath)
-        db.executeScript(conn, script)
-        db.closeDb(conn)
-
     #support functions
     @staticmethod
     def getExistQuery(obj, propertyTagList):
@@ -77,6 +72,12 @@ class db:
             whereClause = ""
 
         return "SELECT {columnList} FROM {entity}{whereClause};".format(columnList=columnList, entity=obj.objectEntity, whereClause=whereClause)
+
+
+    @staticmethod
+    def configureForGUID():
+        sqlite3.register_converter('GUID', lambda b: uuid.UUID(bytes_le=b))
+        sqlite3.register_adapter(uuid.UUID, lambda u: buffer(u.bytes_le))
 
     @staticmethod
     def initDb(dbPath):
@@ -138,6 +139,15 @@ class db:
 
         return id
     
+    #executeScriptPath("proj1.db", "init.sql")
+    @staticmethod
+    def executeScriptPath(dbPath, scriptPath):
+
+        conn = db.initDb(dbPath)
+        script = db.loadFile(scriptPath)
+        db.executeScript(conn, script)
+        db.closeDb(conn)
+
     @staticmethod
     def executeScript(conn, queryFromScript):
         cur = conn.cursor()
