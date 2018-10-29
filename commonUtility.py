@@ -16,3 +16,12 @@ class commonUtility:
             return dict[key]
         else:
             return None
+
+    @staticmethod
+    def loadFile(filePath):
+        data = ""
+
+        with open(filePath, 'r') as filePtr:
+            data = filePtr.read().replace('\n', '')
+
+        return data

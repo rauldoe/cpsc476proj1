@@ -36,14 +36,13 @@ app = Flask(__name__)
 
 basic_auth = cpsc476Auth(app)
 
-dbPath = infrastructure.getDbCommon()
-
 #def __init__(self):
 #    self.basic_auth.dbPath = dbPath
 
 @app.route(forumsUrl, methods=[httpUtility.GET])
 def getForums():
 
+    dbPath = infrastructure.getDbCommon()
     whereList = {}
     ilist = appUtility.loadList(dbPath, forum, whereList)
     response = make_response(ilist.serialize(), httpUtility.Ok)
@@ -54,6 +53,7 @@ def getForums():
 @basic_auth.required
 def createForum():
 
+    dbPath = infrastructure.getDbCommon()
     obj = objectBase.deserializeObject(request.json, forum)
     obj.creator = basic_auth.username
 
@@ -67,6 +67,7 @@ def createForum():
 @app.route(forumsFromForumIdUrl, methods=[httpUtility.GET])
 def getThreadsByForum(forum_id):
 
+    dbPath = infrastructure.getDbCommon()
     whereList = {"forum_id":forum_id}
     ilist = appUtility.loadList(dbPath, threadConversation, whereList)
 
@@ -79,6 +80,7 @@ def getThreadsByForum(forum_id):
 @basic_auth.required
 def createThread(forum_id):
 
+    dbPath = infrastructure.getDbCommon()
     obj = objectBase.deserializeObject(request.json, threadConversation)
     obj.forum_id = forum_id
     obj.author = basic_auth.username
@@ -99,17 +101,18 @@ def createThread(forum_id):
 @app.route(forumsFromForumIdThreadIdUrl, methods=[httpUtility.GET])
 def getPostsByThread(forum_id, thread_id):
 
-    myDbPath = infrastructure.getDb(thread_id)
+    dbPath = infrastructure.getDbCommon()
     checkObj = threadConversation()
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
-    isPassed = appUtility.ifNotExistDoError(myDbPath, checkObj, ["id", "forum_id"], httpUtility.NotFound)
+    isPassed = appUtility.ifNotExistDoError(dbPath, checkObj, ["id", "forum_id"], httpUtility.NotFound)
     if not isPassed:
         return
 
+    postDbPath = infrastructure.getDb(thread_id)
     whereList = {"thread_id":thread_id}
-    ilist = appUtility.loadList(myDbPath, post, whereList)
+    ilist = appUtility.loadList(postDbPath, post, whereList)
 
     response = make_response(ilist.serialize(), httpUtility.Ok)
     response.headers["Content-Type"] = "application/json"
@@ -120,20 +123,21 @@ def getPostsByThread(forum_id, thread_id):
 @basic_auth.required
 def createPost(forum_id, thread_id):
 
-    myDbPath = infrastructure.getDb(thread_id)
+    dbPath = infrastructure.getDbCommon()
     checkObj = threadConversation()
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
-    isPassed = appUtility.ifNotExistDoError(myDbPath, checkObj, ["id", "forum_id"], httpUtility.NotFound)
+    isPassed = appUtility.ifNotExistDoError(dbPath, checkObj, ["id", "forum_id"], httpUtility.NotFound)
     if not isPassed:
         return
 
+    postDbPath = infrastructure.getDb(thread_id)
     obj = objectBase.deserializeObject(request.json, post)
     obj.thread_id = thread_id
     obj.poster = basic_auth.username
     obj.timestamp = datetime.datetime.now()
-    obj = db.executeInsert(myDbPath, obj)
+    obj = db.executeInsert(postDbPath, obj)
 
     response = make_response(obj.serializeJson(), httpUtility.Created)
 
@@ -142,6 +146,7 @@ def createPost(forum_id, thread_id):
 @app.route(usersUrl, methods=[httpUtility.POST])
 def createUser():
 
+    dbPath = infrastructure.getDbCommon()
     obj = objectBase.deserializeObject(request.json, user)
 
     isPassed = appUtility.ifExistDoError(dbPath, obj, ["username"], httpUtility.Conflict)
@@ -158,6 +163,7 @@ def createUser():
 @basic_auth.required
 def changeUserPassword(username):
 
+    dbPath = infrastructure.getDbCommon()
     obj = objectBase.deserializeObject(request.json, user)
     obj.username = username
 

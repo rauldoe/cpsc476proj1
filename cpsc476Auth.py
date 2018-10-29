@@ -3,6 +3,7 @@ from flask_basicauth import BasicAuth
 from db import db
 from user import user
 from infrastructure import infrastructure
+from objectUtility import objectUtility
 
 #app.config['BASIC_AUTH_FORCE'] = True
 
@@ -21,10 +22,9 @@ class cpsc476Auth(BasicAuth):
         obj.username = username
         obj.password = password
 
-        query = db.getExistQuery(obj, ["username", "password"])
-        conn = db.initDb(self.dbPath)
-        doesExist = db.executeIfExist(conn, query)
-        db.closeDb(conn)
+        query = objectUtility.getExistQuery(obj, ["username", "password"])
+
+        doesExist = db.executeIfExist(self.dbPath, query)
 
         if doesExist:
             self.username = obj.username

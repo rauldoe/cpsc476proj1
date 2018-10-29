@@ -4,6 +4,7 @@ from flask import abort
 from commonUtility import commonUtility
 from db import db
 from objectList import objectList
+from objectUtility import objectUtility
 
 class appUtility:
 
@@ -14,16 +15,14 @@ class appUtility:
 
         ilist = objectList(objectType)
 
-        query = db.getSelectQuery(objectType, whereList)
-        conn = db.initDb(dbPath)
-        dataList = db.executeReturnList(conn, query)
+        query = objectUtility.getSelectQuery(objectType, whereList)
+
+        dataList = db.executeReturnList(dbPath, query)
         for i in dataList:
             obj = ilist.objectType()
             #ilist.processPerProperty(lambda iobj, j: iobj.setValue(j, i[j]), appUtility.emptyFunc, appUtility.emptyFunc)
             appUtility.processObjectProp(obj, lambda iobj, j: iobj.setValue(j, i[j]))
             ilist.append(obj)
-
-        db.closeDb(conn)
 
         return ilist
 
@@ -43,7 +42,7 @@ class appUtility:
 
     @staticmethod
     def checkIfExistObj(dbPath, obj, propertyTag, errorStatus, statusWhenExist):
-        query = db.getExistQuery(obj, propertyTag)
+        query = objectUtility.getExistQuery(obj, propertyTag)
         return appUtility.checkIfExist(dbPath, query, errorStatus, statusWhenExist)
 
     @staticmethod
@@ -51,9 +50,7 @@ class appUtility:
 
         isPassed = True
 
-        conn = db.initDb(dbPath)
-        doesExist = db.executeIfExist(conn, query)
-        db.closeDb(conn)
+        doesExist = db.executeIfExist(dbPath, query)
 
         if statusWhenExist == 0:
             if doesExist:

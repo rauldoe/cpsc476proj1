@@ -11,7 +11,7 @@ class infrastructure:
     
     @staticmethod
     def getDb(ctxData):
-        return infrastructure.shardDbBase + str(infrastructure.getShardKey(ctxData))
+        return infrastructure.shardDbBase + str(infrastructure.getShardKey(ctxData)) + ".db"
 
     @staticmethod
     def getDbCommon():

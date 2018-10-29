@@ -1,43 +1,35 @@
-import json
+import sqlite3
+import uuid
+import pprint
 
-from flask import jsonify
+def make_dicts(cursor, row):
+    return dict((cursor.description[idx][0], value)
+                for idx, value in enumerate(row))
 
-from forum import forum
-from threadConversation import threadConversation
-from db import db
-from post import post
+sqlite3.register_converter('GUID', lambda b: uuid.UUID(bytes_le=b))
+sqlite3.register_adapter(uuid.UUID, lambda u: u.bytes_le)
 
-from commonUtility import commonUtility
-from appUtility import appUtility
+conn = sqlite3.connect('test.db', detect_types=sqlite3.PARSE_DECLTYPES)
+conn.row_factory = make_dicts
 
-dbPath = 'proj1.db'
+c = conn.cursor()
+#c.execute('CREATE TABLE test (guid GUID PRIMARY KEY, name TEXT)')
 
-x = forum()
-x.name = "test"
-x.creator = "ddsd"
+data = (uuid.uuid4(), 'foo')
+#pprint.pprint(data)
+#c.execute('INSERT INTO test VALUES (?,?)', data)
 
-xlist = [x]
 
-#db.executeInsert('proj1.db', x)
-#print(json.dumps([i.serializeItem() for i in xlist]))
 
-y = post()
-y.thread_id = 90
-y.text1 = "weereredsf"
-#print(db.getExistQuery(x, ["name", "creator"]))
+c.execute('''
+        INSERT INTO test(guid, name) 
+        VALUES (?, ?)
+    '''
+    , (uuid.UUID('7005d0e0-f25b-45f9-897d-bae151fddaff'), 'user'))
+conn.commit()
 
-#print(db.getSelectQuery(forum, {"name":"testerdsfds", "creator":"maymay"}))
-#print(db.getSelectQuery(post, {"thread_id":7878, "title":"223k432jl"}))
-#print(db.getSelectQuery(post, {}))
-whereList = {}
-whereList = {"poster":"jack"}
-olist = appUtility.loadList(dbPath, post, whereList)
+#c.execute('SELECT * FROM test')
+#pprint.pprint('Result Data:' +  str(c.fetchone()))
 
-propFunc1 = lambda obj, i:print(i+":"+str(obj.getValue(i)))
-#olist.processPerProperty(propFunc1, appUtility.emptyFunc, appUtility.emptyFunc)
-
-y = post()
-y.id = 8838
-y.thread_id = 90
-y.text = "weereredsf"
-db.executeUpdate(dbPath, y, ["id", "thread_id"])
+c.close()
+conn.close()
