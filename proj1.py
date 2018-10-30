@@ -2,6 +2,7 @@
 
 import sqlite3
 import datetime
+import uuid
 
 from flask import Flask
 from flask import g
@@ -101,6 +102,8 @@ def createThread(forum_id):
 @app.route(forumsFromForumIdThreadIdUrl, methods=[httpUtility.GET])
 def getPostsByThread(forum_id, thread_id):
 
+    db.configureForGUID()
+
     dbPath = infrastructure.getDbCommon()
     checkObj = threadConversation()
     checkObj.id = thread_id
@@ -123,6 +126,8 @@ def getPostsByThread(forum_id, thread_id):
 @basic_auth.required
 def createPost(forum_id, thread_id):
 
+    db.configureForGUID()
+    
     dbPath = infrastructure.getDbCommon()
     checkObj = threadConversation()
     checkObj.id = thread_id
@@ -134,10 +139,11 @@ def createPost(forum_id, thread_id):
 
     postDbPath = infrastructure.getDb(thread_id)
     obj = objectBase.deserializeObject(request.json, post)
+    obj.id = uuid.uuid4()
     obj.thread_id = thread_id
     obj.poster = basic_auth.username
     obj.timestamp = datetime.datetime.now()
-    obj = db.executeInsert(postDbPath, obj)
+    obj = db.executeInsertWithId(postDbPath, obj)
 
     response = make_response(obj.serializeJson(), httpUtility.Created)
 

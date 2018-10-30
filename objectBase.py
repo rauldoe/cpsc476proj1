@@ -1,4 +1,6 @@
 
+import uuid
+import pprint
 from flask import jsonify
 
 from commonUtility import commonUtility
@@ -32,8 +34,22 @@ class objectBase:
         pLookup = {}
         for k, v in self._objectLookup.items():
             if k != self._objectName_tag:
-                pLookup[k] = v
+                if k == self._id_tag:
 
+                    if isinstance(v, uuid.UUID):
+                        pLookup[k] = v.urn[9:]
+                    else:
+                        pLookup[k] = v
+                else:
+                    pLookup[k] = v
+        return pLookup
+
+    @property
+    def objectValueArrayWithId(self):
+        pLookup = []
+        for k, v in self._objectLookup.items():
+            if k != self._objectName_tag:
+                pLookup.append(v)
         return pLookup
 
     #id
@@ -72,7 +88,10 @@ class objectBase:
         return self._objectLookup[tag]
 
     def setValue(self, tag, value):
-        self._objectLookup[tag] = value
+        if ((tag == self._id_tag) and isinstance(value, bytes)):
+            self._objectLookup[tag] = uuid.UUID(bytes_le=value)
+        else:
+            self._objectLookup[tag] = value
 
     def isInstrinsic(self, tag):
         return ((tag == self._id_tag)  or (tag == self._objectName_tag))

@@ -26,6 +26,27 @@ class db:
     
         return obj
 
+    @staticmethod
+    def executeInsertWithId(dbPath, obj):
+
+        pLookup = obj.objectPropertyListWithId
+        data = obj.objectValueArrayWithId
+
+        columnList = ', '.join(map(lambda i: i, pLookup))
+        valueList = ', '.join(map(lambda i: "?", pLookup))
+
+        #data = (uuid.uuid4(), 4, 'my text2', 'poster2', datetime.datetime.now())
+        #db.executeInsertWithQuery(dbPath, insertQuery, data)
+
+        query = "INSERT INTO {tableName}({columnList}) VALUES({valueList});".format(tableName=obj.objectEntity, columnList=columnList, valueList=valueList)
+        #print(query)
+
+        db.executeInsertWithQuery(dbPath, query, data)
+
+        #obj.id = id
+    
+        return obj
+
     #UPDATE table_name
     #SET column1 = value1, column2 = value2, ...
     #WHERE condition;
@@ -70,14 +91,7 @@ class db:
     @staticmethod
     def executeInsertWithQuery(dbPath, insertQuery, data):
         conn = db.__initDb(dbPath)
-
-        #data = (uuid.uuid4(), 'foo')
-        #conn.execute('INSERT INTO test VALUES (?,?)', data)
-        print(insertQuery)
-        print(data)
-        cursor = conn.cursor()
-        cursor.execute(insertQuery, data)
-        cursor.close()
+        db.__executeInsertWithQuery(conn, insertQuery, data)
         db.__closeDb(conn)
 
     @staticmethod
@@ -139,6 +153,17 @@ class db:
         cursor.close()
 
         return list
+
+    @staticmethod
+    def __executeInsertWithQuery(conn, insertQuery, data):
+
+        #data = (uuid.uuid4(), 'foo')
+        #conn.execute('INSERT INTO test VALUES (?,?)', data)
+        print(insertQuery)
+        print(data)
+        cursor = conn.cursor()
+        cursor.execute(insertQuery, data)
+        cursor.close()
 
     @staticmethod
     def __closeDb(conn):
