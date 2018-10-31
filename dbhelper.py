@@ -12,6 +12,16 @@ class dbhelper:
         else:
             return dict[key]
 
+
+    @staticmethod
+    def executeInsert(dbPath, query, data):
+
+        conn = dbhelper.initDb(dbPath)
+        cur = conn.cursor()
+        cur.execute(query, data)
+        cur.close()
+        dbhelper.closeDb(conn)
+
     @staticmethod
     def insert(dbPath, obj):
 

@@ -2,6 +2,7 @@
 
 import sqlite3
 import datetime
+import uuid
 
 from flask import Flask
 from flask import g
@@ -21,7 +22,7 @@ from Auth import Auth
 from helper import helper
 from user import user
 
-dbPath = "proj.db"
+dbPath = "proj1.db"
 
 app = Flask(__name__)
 
@@ -85,16 +86,19 @@ def createThread(forum_id):
 @app.route("/forums/<int:forum_id>/<int:thread_id>", methods=['GET'])
 def getPostsByThread(forum_id, thread_id):
 
+    sqlite3.register_converter('GUID', lambda b: uuid.UUID(bytes_le=b))
+    sqlite3.register_adapter(uuid.UUID, lambda u: u.bytes_le)
+
     checkObj = thread()
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
-    good = helper.ifnotexist(getDbPath(thread_id), checkObj, ["id", "forum_id"], 404)
+    good = helper.ifnotexist(dbPath, checkObj, ["id", "forum_id"], 404)
     if not good:
         return
 
     whereList = {"thread_id":thread_id}
-    ilist = helper.getList(dbPath, post, whereList)
+    ilist = helper.getList(getDbPath(thread_id), post, whereList)
 
     response = make_response(ilist.serialize(), 200)
     response.headers["Content-Type"] = "application/json"
@@ -105,19 +109,26 @@ def getPostsByThread(forum_id, thread_id):
 @basic_auth.required
 def createPost(forum_id, thread_id):
 
+    sqlite3.register_converter('GUID', lambda b: uuid.UUID(bytes_le=b))
+    sqlite3.register_adapter(uuid.UUID, lambda u: u.bytes_le)
+
     checkObj = thread()
     checkObj.id = thread_id
     checkObj.forum_id = forum_id
 
-    good = helper.ifnotexist(getDbPath(thread_id), checkObj, ["id", "forum_id"], 404)
+    good = helper.ifnotexist(dbPath, checkObj, ["id", "forum_id"], 404)
     if not good:
         return
 
     obj = post.deserializeObject(request.json, post)
+    obj.id = uuid.uuid4()
     obj.thread_id = thread_id
     obj.poster = basic_auth.username
     obj.timestamp = datetime.datetime.now()
-    obj = dbhelper.insert(dbPath, obj)
+
+    data = [obj.id, obj.thread_id, obj.text, obj.poster, obj.timestamp]
+    query = "INSERT INTO posts(id, thread_id, text, poster, timestamp) VALUES(?, ?, ?, ?, ?);"
+    dbhelper.executeInsert(getDbPath(thread_id), query, data)
 
     response = make_response(obj.serializeJson(), 201)
 
@@ -163,7 +174,7 @@ def notFound(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 def getDbPath(threadId):
-    return "post" + str(threadId%3)
+    return "post" + str(threadId%3) + ".db"
 
 if __name__ == '__main__':
     app.run(debug=True)
