@@ -187,8 +187,10 @@ def changeUserPassword(username):
 
     return response
 
+@app.cli.command('initdb')
 def init_db():
     create_test_data.init()
+    print('Initialized the database.')
 
 @app.errorhandler(httpUtility.NotFound)
 def notFound(error):

@@ -1,5 +1,15 @@
 "# cpsc476proj1"
- 
+
+To Initialize the DB with test data:
+
+Powershell:
+$env:FLASK_APP = "proj1.py"
+clear;python -m flask initdb
+
+Mac Terminal:
+export FLASK_APP=proj1.py
+clear;python3 -m flask initdb
+
 setup
 git clone https://github.com/rauldoe/cpsc476proj1
 cd cpsc476proj1
