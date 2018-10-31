@@ -25,6 +25,7 @@ from objectBase import objectBase
 from appUtility import appUtility
 from user import user
 from infrastructure import infrastructure
+from create_test_data import create_test_data
 
 forumsUrl = "/forums"
 forumsFromForumIdUrl = forumsUrl + "/<int:forum_id>"
@@ -185,6 +186,9 @@ def changeUserPassword(username):
     response = make_response("", httpUtility.Ok)
 
     return response
+
+def init_db():
+    create_test_data.init()
 
 @app.errorhandler(httpUtility.NotFound)
 def notFound(error):
