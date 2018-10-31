@@ -1,4 +1,9 @@
 "# cpsc476proj1"
+ 
+setup
+git clone https://github.com/rauldoe/cpsc476proj1
+cd cpsc476proj1
+git checkout yash_v2
 
 installation:
 python -m pip install flask
