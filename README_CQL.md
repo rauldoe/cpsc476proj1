@@ -1,6 +1,9 @@
 
 Note: These are sample calls.  You must adapt them to your installation of Dockers to make it work properly.
 
+Get Container Id
+docker ps
+
 Copy Files
 docker cp init_post.cql 933e9018f8ea:/init_post.cql
 
