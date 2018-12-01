@@ -39,7 +39,7 @@ session.execute(
 dataList = session.execute("SELECT * FROM posts;")
 
 for i in dataList:
-    print(i.text1)
+    print(str(i.id) + ", " + i.text1 + ", " + i.poster)
 
 session.execute(
     """

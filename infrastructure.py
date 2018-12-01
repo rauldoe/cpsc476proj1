@@ -4,6 +4,7 @@ class infrastructure:
     moduloKey = 3
     shardDbBase = "posts"
     dbPath = "proj1.db"
+    keyspace = "proj3"
 
     @staticmethod
     def getShardKey(ctxData):
@@ -16,4 +17,8 @@ class infrastructure:
     @staticmethod
     def getDbCommon():
         return infrastructure.dbPath
+
+    @staticmethod
+    def getKeyspace():
+        return infrastructure.keyspace
 
