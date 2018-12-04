@@ -1,8 +1,14 @@
 
 Note: These are sample calls.  You must adapt them to your installation of Dockers to make it work properly.
 
+Run Python tester to test cql data utility
+clear; python test_cql1.py
+OR
+clear; python3 test_cql1.py
+
 Run Python tester to test your Scylla setup
 clear; python test_cql.py
+OR
 clear; python3 test_cql.py
 
 Get IP Address of Container, 172.17.0.2
@@ -28,3 +34,6 @@ docker exec -it scylla cqlsh -f init_post.cql
 Run posts population
 docker exec -it scylla cqlsh -f populate_post.cql
 
+Run scylla status
+docker exec -it scylla nodetool status
+docker logs scylla
