@@ -2,6 +2,7 @@
 from infrastructure import infrastructure
 from db import db
 from populate_post import populate_post
+from cql import cql
 
 class create_test_data:
 
@@ -24,3 +25,17 @@ class create_test_data:
 
         populate_post.populate()
 
+    @staticmethod
+    def initCql():
+        dbPath = infrastructure.getDbCommon()
+        db.executeScriptPath(dbPath, "init.sql")
+        db.executeScriptPath(dbPath, "populate.sql")
+
+        keyspace = infrastructure.getKeyspace()
+        conn = cql.initDb(keyspace)
+        session = conn['session']
+
+        cql.executeScriptPath(session, "init_post1.cql")
+        cql.executeScriptPath(session, "populate_post1.cql")
+        
+        cql.closeDb(conn)

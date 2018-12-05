@@ -17,6 +17,14 @@ class cql:
         return {'cluster': cluster, 'session': session}
 
     @staticmethod
+    def executeScriptPath(session, scriptPath):
+
+        scriptList = commonUtility.loadFileWithDelimiter(scriptPath, ';')
+        for i in scriptList:
+            print(i)
+            cql.execute(session, i)
+        
+    @staticmethod
     def execute(session, query):
         return session.execute(query)
 
