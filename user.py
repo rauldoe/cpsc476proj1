@@ -9,7 +9,10 @@ class user(objectBase):
 
         self.objectLookup[self.username_tag] = None
         self.objectLookup[self.password_tag] = None
-    
+
+        self.objectDataTypeLookup[self.username_tag] = 'str'
+        self.objectDataTypeLookup[self.password_tag] = 'str'  
+
     username_tag = "username"
     @property
     def username(self):

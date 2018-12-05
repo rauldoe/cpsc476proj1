@@ -34,7 +34,7 @@ class cql:
         data = session.execute("SELECT MAX(id) AS maxval FROM {objectName};".format(objectName=obj.objectEntity))
 
         for i in data:
-            maxval = i.maxval
+            maxval = i['maxval']
             break
 
         return maxval

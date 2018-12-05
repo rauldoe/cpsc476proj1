@@ -11,7 +11,13 @@ class threadConversation(objectBase):
         self.objectLookup[self.text_tag] = None
         self.objectLookup[self.author_tag] = None
         self.objectLookup[self.timestamp_tag] = None
-        
+
+        self.objectDataTypeLookup[self.forum_id_tag] = 'int'
+        self.objectDataTypeLookup[self.title_tag] = 'str'
+        self.objectDataTypeLookup[self.text_tag] = 'str'
+        self.objectDataTypeLookup[self.author_tag] = 'str'
+        self.objectDataTypeLookup[self.timestamp_tag] = 'datetime'      
+
     forum_id_tag = "forum_id"
     @property
     def forum_id(self):

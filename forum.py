@@ -9,6 +9,9 @@ class forum(objectBase):
         self.objectLookup[self.name_tag] = None
         self.objectLookup[self.creator_tag] = None
 
+        self.objectDataTypeLookup[self.name_tag] = 'str'
+        self.objectDataTypeLookup[self.creator_tag] = 'str'  
+
     name_tag = "name"
     @property
     def name(self):

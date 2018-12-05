@@ -3,10 +3,18 @@
 To Initialize the DB with test data:
 
 Powershell:
+new:
+$env:FLASK_APP = "proj3.py"
+clear;python -m flask initdb
+
 $env:FLASK_APP = "proj1.py"
 clear;python -m flask initdb
 
 Mac Terminal:
+new:
+export FLASK_APP=proj3.py
+clear;python3 -m flask initdb
+
 export FLASK_APP=proj1.py
 clear;python3 -m flask initdb
 
@@ -23,12 +31,20 @@ python3 -m pip install flask
 python3 -m pip install Flask-BasicAuth
 
 Powershell:
+new:
+$env:FLASK_APP = "proj3.py"
+clear;python -m flask run
+
 $env:FLASK_APP = "proj1.py"
 clear;python -m flask run
 
 Mac Terminal:
+new:
 export FLASK_APP=proj3.py
 clear;python3 -m flask run
+OR
+export FLASK_APP=proj3.py
+clear;python -m flask run
 
 export FLASK_APP=proj1.py
 clear;python3 -m flask run
