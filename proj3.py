@@ -123,7 +123,7 @@ def getPostsByThread(forum_id, thread_id):
     whereList = {"thread_id":thread_id}
     ilist = appUtility.loadListCql(session, post1, whereList)
     cql.closeDb(conn)
-    
+
     response = make_response(ilist.serialize(), httpUtility.Ok)
     response.headers["Content-Type"] = "application/json"
 
@@ -148,6 +148,7 @@ def createPost(forum_id, thread_id):
     conn = cql.initDb(keyspace)
     session = conn['session']
     obj = objectBase.deserializeObject(request.json, post1)
+    #This column is just for debugging
     obj.id = cql.executeReturnMax(session, obj) + 1
     obj.thread_id = thread_id
     obj.poster = basic_auth.username
@@ -155,7 +156,17 @@ def createPost(forum_id, thread_id):
     #text1 is deserialized from post1
     #obj.text1 = "text1"
     cql.insertObject(session, obj)
+
+
     cql.closeDb(conn)
+
+    updateThreadConversation = checkObj
+    whereList = {"id":updateThreadConversation.id}
+    ilist = appUtility.loadList(dbPath, threadConversation, whereList)
+
+    updateThreadConversation = ilist.item(0)
+    updateThreadConversation.timestamp = obj.timestamp1
+    db.executeUpdate(dbPath, updateThreadConversation, whereList)
 
     response = make_response(obj.serializeJson(), httpUtility.Created)
 

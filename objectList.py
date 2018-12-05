@@ -11,6 +11,9 @@ class objectList:
         self.objectName = obj.objectName
         self.mList = []
 
+    def item(self, index):
+        return self.mList[index]
+
     def append(self, item):
         self.mList.append(item)
 

@@ -3,7 +3,7 @@ class infrastructure:
 
     moduloKey = 3
     shardDbBase = "posts"
-    dbPath = "proj1.db"
+    dbPath = "proj3.db"
     keyspace = "proj3"
 
     @staticmethod
