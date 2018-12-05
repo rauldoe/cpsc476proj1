@@ -16,6 +16,14 @@ class objectBase:
         self._objectType = self.__class__
         self.id = None
 
+        # int, float, str, bool
+        self._objectDataTypeLookup = {}
+        self._objectDataTypeLookup[self._id_tag] = 'int'
+
+    @property
+    def objectDataTypeLookup(self):
+        return self._objectDataTypeLookup
+
     @property
     def objectLookup(self):
         return self._objectLookup

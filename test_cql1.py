@@ -27,9 +27,9 @@ parameterTagList = "id, thread_id, text1, poster, timestamp1"
 parameterIdList = "%(id)s, %(thread_id)s, %(text1)s, %(poster)s, %(timestamp1)s"
 query = ""
 
-cql.insertObject(conn['session'], objectName, parameters, parameterTagList, parameterIdList, query)
+cql.insertWithObjectInfo(conn['session'], objectName, parameters, parameterTagList, parameterIdList, query)
 
-dataList = cql.retrieveList(conn['session'], objectName)
+dataList = cql.executeReturnList(conn['session'], objectName)
 
 print("Posts Table")
 for i in dataList:
@@ -45,9 +45,9 @@ parameters['timestamp1'] = timestamp1
 parameterList = "thread_id = %(thread_id)s, text1 = %(text1)s, poster = %(poster)s, timestamp1 = %(timestamp1)s"
 query = ""
 
-cql.updateObject(conn['session'], objectName, parameters, parameterList, query)
+cql.updateWithObjectInfo(conn['session'], objectName, parameters, parameterList, query)
 
-dataList = cql.retrieveList(conn['session'], objectName)
+dataList = cql.executeReturnList(conn['session'], objectName)
 
 print("Posts Table")
 for i in dataList:
@@ -55,9 +55,9 @@ for i in dataList:
 
 idToDelete = 4
 query = ""
-cql.deleteObject(conn['session'], objectName, idToDelete, query)
+cql.deleteWithObjectInfo(conn['session'], objectName, idToDelete, query)
 
-dataList = cql.retrieveList(conn['session'], objectName)
+dataList = cql.executeReturnList(conn['session'], objectName)
 
 print("Posts Table")
 for i in dataList:

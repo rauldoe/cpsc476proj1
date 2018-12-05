@@ -1,10 +1,14 @@
 
+
+import json
+
 from flask import abort
 
 from commonUtility import commonUtility
 from db import db
 from objectList import objectList
 from objectUtility import objectUtility
+from cql import cql
 
 class appUtility:
 
@@ -21,6 +25,22 @@ class appUtility:
         for i in dataList:
             obj = ilist.objectType()
             #ilist.processPerProperty(lambda iobj, j: iobj.setValue(j, i[j]), appUtility.emptyFunc, appUtility.emptyFunc)
+            appUtility.processObjectProp(obj, lambda iobj, j: iobj.setValue(j, i[j]))
+            ilist.append(obj)
+
+        return ilist
+
+    @staticmethod    
+    def loadListCql(session, objectType, whereList):
+
+        ilist = objectList(objectType)
+
+        query = objectUtility.getSelectQuery(objectType, whereList)
+
+        dataList = cql.execute(session, query)
+
+        for i in dataList:
+            obj = ilist.objectType()
             appUtility.processObjectProp(obj, lambda iobj, j: iobj.setValue(j, i[j]))
             ilist.append(obj)
 

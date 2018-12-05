@@ -27,6 +27,9 @@ $env:FLASK_APP = "proj1.py"
 clear;python -m flask run
 
 Mac Terminal:
+export FLASK_APP=proj3.py
+clear;python3 -m flask run
+
 export FLASK_APP=proj1.py
 clear;python3 -m flask run
 

@@ -1,6 +1,7 @@
 import json
 
 from objectBase import objectBase
+from appJsonEncoder import appJsonEncoder
 
 class objectList:
 
@@ -14,7 +15,7 @@ class objectList:
         self.mList.append(item)
 
     def serialize(self):
-        return json.dumps([i.serializeItem() for i in self.mList])
+        return json.dumps([i.serializeItem() for i in self.mList], cls=appJsonEncoder)
 
     def find(self, id):
         subList = objectList(self.objectType)

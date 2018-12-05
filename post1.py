@@ -11,6 +11,11 @@ class post1(objectBase):
         self.objectLookup[self.text1_tag] = None
         self.objectLookup[self.poster_tag] = None
         self.objectLookup[self.timestamp1_tag] = None
+
+        self.objectDataTypeLookup[self.thread_id_tag] = 'int'
+        self.objectDataTypeLookup[self.text1_tag] = 'str'
+        self.objectDataTypeLookup[self.poster_tag] = 'str'
+        self.objectDataTypeLookup[self.timestamp1_tag] = 'datetime'       
     
     thread_id_tag = "thread_id"
     @property

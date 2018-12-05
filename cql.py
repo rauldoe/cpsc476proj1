@@ -1,6 +1,7 @@
 
 from commonUtility import commonUtility
 from cassandra.cluster import Cluster
+from cassandra.query import dict_factory
 
 class cql:
 
@@ -11,15 +12,38 @@ class cql:
 
         #keyspace = "proj3"
         session.set_keyspace(keyspace)
+        session.row_factory = dict_factory
 
         return {'cluster': cluster, 'session': session}
 
     @staticmethod
-    def retrieveList(session, objectName):
+    def execute(session, query):
+        return session.execute(query)
+
+    @staticmethod
+    def executeReturnMax(session, obj):
+        maxval = 0
+        data = session.execute("SELECT MAX(id) AS maxval FROM {objectName};".format(objectName=obj.objectEntity))
+
+        for i in data:
+            maxval = i.maxval
+            break
+
+        return maxval
+
+    @staticmethod
+    def executeReturnList(session, objectName):
         return session.execute("SELECT * FROM {objectName};".format(objectName=objectName))
     
     @staticmethod
-    def insertObject(session, objectName, parameters, parameterTagList, parameterIdList, query):
+    def executeReturnObjectList(session, obj):
+
+        pLookup = obj.objectPropertyListWithId
+        columnList = ', '.join(map(lambda i: i, pLookup))
+        return session.execute("SELECT {columnList} FROM {objectName};".format(columnList=columnList, objectName=obj.objectEntity))
+
+    @staticmethod
+    def insertWithObjectInfo(session, objectName, parameters, parameterTagList, parameterIdList, query):
 
         #parameters = {}
         #parameters['id'] = id
@@ -38,7 +62,26 @@ class cql:
         session.execute(query, parameters)
 
     @staticmethod
-    def updateObject(session, objectName, parameters, parameterList, query):
+    def insertObject(session, obj):
+
+        pLookup = obj.objectPropertyListWithId
+
+        parameterTagList = ', '.join(map(lambda i: i, pLookup))
+        parameterIdList = ', '.join(map(lambda i: "%({j})s".format(j=i), pLookup))
+        
+        query = """
+            INSERT INTO {objectName} ({parameterTagList})
+                VALUES ({parameterIdList})
+        """.format(objectName=obj.objectEntity, parameterTagList=parameterTagList, parameterIdList=parameterIdList)
+
+        parameters = {}
+        for i in pLookup:
+            parameters[i] =  obj.getValue(i)
+
+        session.execute(query, parameters)
+
+    @staticmethod
+    def updateWithObjectInfo(session, objectName, parameters, parameterList, query):
 
         #parameters = {}
         #parameters['id'] = id
@@ -57,13 +100,41 @@ class cql:
         session.execute(query, parameters)
 
     @staticmethod
-    def deleteObject(session, objectName, id, query):
+    def updateObject(session, obj):
+
+        pLookup = obj.objectPropertyList
+        
+        parameterList = ', '.join(map(lambda i: "{tag} = %({tag})s".format(tag=i), pLookup))
+        query = """
+            UPDATE {objectName} SET
+                {parameterList}
+                WHERE id = %(id)s
+        """.format(objectName=obj.objectEntity, parameterList=parameterList)
+        
+        pLookupWithId = obj.objectPropertyListWithId
+        parameters = {}
+        for i in pLookupWithId:
+            parameters[i] =  obj.getValue(i)
+
+        session.execute(query, parameters)
+
+    @staticmethod
+    def deleteWithObjectInfo(session, objectName, id, query):
 
         query = """
             DELETE FROM {objectName} WHERE id = %(id)s
-        """.format(objectName=objectName, id=id)
+        """.format(objectName=objectName)
         
         session.execute(query, {'id': id})
+
+    @staticmethod
+    def deleteObject(session, obj):
+
+        query = """
+            DELETE FROM {objectName} WHERE id = %(id)s
+        """.format(objectName=obj.objectEntity)
+        
+        session.execute(query, {'id': obj.id})
 
     @staticmethod
     def closeDb(conn):

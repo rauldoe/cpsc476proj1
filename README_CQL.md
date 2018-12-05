@@ -1,6 +1,9 @@
 
 Note: These are sample calls.  You must adapt them to your installation of Dockers to make it work properly.
 
+Get to Container Terminal
+docker exec -it scylla /bin/bash
+
 Run Python tester to test cql data utility
 clear; python test_cql1.py
 OR

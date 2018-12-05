@@ -26,6 +26,8 @@ from appUtility import appUtility
 from user import user
 from infrastructure import infrastructure
 from create_test_data import create_test_data
+from post1 import post1
+from cql import cql
 
 forumsUrl = "/forums"
 forumsFromForumIdUrl = forumsUrl + "/<int:forum_id>"
@@ -103,7 +105,7 @@ def createThread(forum_id):
 @app.route(forumsFromForumIdThreadIdUrl, methods=[httpUtility.GET])
 def getPostsByThread(forum_id, thread_id):
 
-    db.configureForGUID()
+    #db.configureForGUID()
 
     dbPath = infrastructure.getDbCommon()
     checkObj = threadConversation()
@@ -114,9 +116,12 @@ def getPostsByThread(forum_id, thread_id):
     if not isPassed:
         return
 
-    postDbPath = infrastructure.getDb(thread_id)
+    keyspace = infrastructure.getKeyspace()
+    conn = cql.initDb(keyspace)
+    session = conn['session']
+
     whereList = {"thread_id":thread_id}
-    ilist = appUtility.loadList(postDbPath, post, whereList)
+    ilist = appUtility.loadListCql(session, post1, whereList)
 
     response = make_response(ilist.serialize(), httpUtility.Ok)
     response.headers["Content-Type"] = "application/json"
@@ -127,7 +132,7 @@ def getPostsByThread(forum_id, thread_id):
 @basic_auth.required
 def createPost(forum_id, thread_id):
 
-    db.configureForGUID()
+    #db.configureForGUID()
     
     dbPath = infrastructure.getDbCommon()
     checkObj = threadConversation()
@@ -138,13 +143,17 @@ def createPost(forum_id, thread_id):
     if not isPassed:
         return
 
-    postDbPath = infrastructure.getDb(thread_id)
-    obj = objectBase.deserializeObject(request.json, post)
-    obj.id = uuid.uuid4()
+    keyspace = infrastructure.getKeyspace()
+    conn = cql.initDb(keyspace)
+    session = conn['session']
+    obj = objectBase.deserializeObject(request.json, post1)
+    obj.id = cql.executeReturnMax(session, obj) + 1
     obj.thread_id = thread_id
     obj.poster = basic_auth.username
-    obj.timestamp = datetime.datetime.now()
-    obj = db.executeInsertWithId(postDbPath, obj)
+    obj.timestamp1 = datetime.datetime.now()
+    #text1 is deserialized from post1
+    #obj.text1 = "text1"
+    cql.insertObject(session, obj)
 
     response = make_response(obj.serializeJson(), httpUtility.Created)
 
