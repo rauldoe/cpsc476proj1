@@ -163,6 +163,10 @@ def createPost(forum_id, thread_id):
 
     session.execute(query, parameters)
 
+    conn = dbhelper.initDb(dbPath)
+    dbhelper.execute(conn, 'UPDATE threads SET timestamp = ' + "'" + str(obj.timestamp1) + "' WHERE id=" + str(thread_id))
+    dbhelper.closeDb(conn)
+
     response = make_response(obj.serializeJson(), 201)
 
     return response
