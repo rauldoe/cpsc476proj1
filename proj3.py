@@ -2,6 +2,7 @@
 
 import sqlite3
 import datetime
+import uuid
 
 from flask import Flask
 from flask import g
@@ -20,6 +21,8 @@ from post import post
 from Auth import Auth
 from helper import helper
 from user import user
+from cassandra.cluster import Cluster
+from cassandra.query import dict_factory
 
 dbPath = "proj.db"
 
@@ -93,8 +96,29 @@ def getPostsByThread(forum_id, thread_id):
     if not good:
         return
 
-    whereList = {"thread_id":thread_id}
-    ilist = helper.getList(dbPath, post, whereList)
+
+    cluster = Cluster()
+    session = cluster.connect()
+
+    session.set_keyspace('mykey')
+    session.row_factory = dict_factory
+
+    query = "SELECT * FROM posts WHERE thread_id=%(thread_id)s;"
+
+    parameters = {}
+    parameters['thread_id'] = thread_id
+
+    dataList = session.execute(query, parameters)
+    ilist = helper(post)
+    for i in dataList:
+        obj = post()
+        obj.id = i['id']
+        obj.thread_id = i['thread_id']
+        obj.poster = i['poster']
+        obj.text1 = i['text1']
+        obj.timestamp1 = i['timestamp1']
+
+        ilist.append(obj)
 
     response = make_response(ilist.serialize(), 200)
     response.headers["Content-Type"] = "application/json"
@@ -114,10 +138,29 @@ def createPost(forum_id, thread_id):
         return
 
     obj = post.deserializeObject(request.json, post)
+    obj.id = uuid.uuid4()
     obj.thread_id = thread_id
     obj.poster = basic_auth.username
-    obj.timestamp = datetime.datetime.now()
-    obj = dbhelper.insert(dbPath, obj)
+    obj.timestamp1 = datetime.datetime.now()
+
+    cluster = Cluster()
+    session = cluster.connect()
+
+    session.set_keyspace('mykey')
+    session.row_factory = dict_factory
+
+    query = """
+        INSERT INTO posts (id, thread_id, text1, poster, timestamp1)
+            VALUES (%(id)s, %(thread_id)s, %(text1)s, %(poster)s, %(timestamp1)s)
+    """
+    parameters = {}
+    parameters['id'] = obj.id
+    parameters['thread_id'] = obj.thread_id
+    parameters['text1'] = obj.text1
+    parameters['poster'] = obj.poster
+    parameters['timestamp1'] = obj.timestamp1
+
+    session.execute(query, parameters)
 
     response = make_response(obj.serializeJson(), 201)
 

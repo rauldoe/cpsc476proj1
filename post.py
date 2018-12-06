@@ -80,7 +80,12 @@ class post:
         pLookup = {}
         for k, v in self._objectLookup.items():
             if k != self._objectName_tag:
-                pLookup[k] = v
+                if k == self._id_tag:
+                    pLookup[k] = v.urn[9:]
+                elif k == self.timestamp1_tag:
+                    pLookup[k] = v.isoformat()
+                else:
+                    pLookup[k] = v
 
         return pLookup
 
