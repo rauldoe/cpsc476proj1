@@ -1,5 +1,6 @@
 
 
+DROP INDEX IF EXISTS proj3.idx_proj3_post1s_thread_id;
 DROP TABLE IF EXISTS proj3.post1s;
 DROP KEYSPACE IF EXISTS proj3;
 
@@ -15,3 +16,5 @@ CREATE TABLE IF NOT EXISTS post1s(
   poster text,
   timestamp1 timestamp
 );
+
+CREATE INDEX IF NOT EXISTS idx_proj3_post1s_thread_id ON post1s(thread_id);
