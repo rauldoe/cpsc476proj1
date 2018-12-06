@@ -12,3 +12,5 @@ CREATE TABLE posts (
   poster text,
   timestamp1 timestamp
 );
+
+CREATE INDEX idx ON post1s(thread_id);
