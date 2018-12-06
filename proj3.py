@@ -148,7 +148,6 @@ def createPost(forum_id, thread_id):
     conn = cql.initDb(keyspace)
     session = conn['session']
     obj = objectBase.deserializeObject(request.json, post1)
-    #This column is just for debugging
     obj.id = cql.executeReturnMax(session, obj) + 1
     obj.thread_id = thread_id
     obj.poster = basic_auth.username
