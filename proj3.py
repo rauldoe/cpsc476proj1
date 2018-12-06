@@ -3,6 +3,7 @@
 import sqlite3
 import datetime
 import uuid
+import os
 
 from flask import Flask
 from flask import g
@@ -200,6 +201,12 @@ def changeUserPassword(username):
     response = make_response("", 200)
 
     return response
+
+@app.cli.command('initdb')
+def initdb_command():
+    """Initializes the database."""
+    os.system('sh ./initdb.sh')
+    print('Initialized the database.')
 
 @app.errorhandler(404)
 def notFound(error):
