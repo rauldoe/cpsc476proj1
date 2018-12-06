@@ -2,10 +2,10 @@
 USE proj3;
 
 INSERT INTO post1s(id, thread_id, text1, poster, timestamp1)
-    VALUES(1, 1, 'text1', 'poster1', '2011-02-03');
+    VALUES(now(), 1, 'text1', 'poster1', '2011-02-03');
 
 INSERT INTO post1s(id, thread_id, text1, poster, timestamp1)
-    VALUES(2, 2, 'text2', 'poster2', '2011-02-04');
+    VALUES(now(), 2, 'text2', 'poster2', '2011-02-04');
 
 INSERT INTO post1s(id, thread_id, text1, poster, timestamp1)
-    VALUES(3, 3, 'text3', 'poster3', '2011-02-05');
+    VALUES(now(), 3, 'text3', 'poster3', '2011-02-05');

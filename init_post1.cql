@@ -10,7 +10,7 @@ CREATE KEYSPACE IF NOT EXISTS proj3
 USE proj3;
 
 CREATE TABLE IF NOT EXISTS post1s(
-  id int PRIMARY KEY, 
+  id uuid PRIMARY KEY, 
   thread_id int, 
   text1 text, 
   poster text,
