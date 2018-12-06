@@ -1,10 +1,8 @@
 
 Note: These are sample calls.  You must adapt them to your installation of Dockers to make it work properly.
 
-Get the indexes
-SELECT column_name, index_name, index_options, index_type, component_index 
-    FROM system.schema_columns 
-    WHERE keyspace_name='proj3'AND columnfamily_name='post1s';
+Clear table
+TRUNCATE TABLE posts;
 
 Get to Container Terminal
 docker exec -it scylla /bin/bash
