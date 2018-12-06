@@ -12,9 +12,9 @@ class post:
         self.id = None
 
         self.objectLookup[self.thread_id_tag] = None
-        self.objectLookup[self.text_tag] = None
+        self.objectLookup[self.text1_tag] = None
         self.objectLookup[self.poster_tag] = None
-        self.objectLookup[self.timestamp_tag] = None
+        self.objectLookup[self.timestamp1_tag] = None
     
     thread_id_tag = "thread_id"
     @property
@@ -25,14 +25,14 @@ class post:
     def thread_id(self, value):
         self.objectLookup[self.thread_id_tag] = value
 
-    text_tag = "text"
+    text1_tag = "text1"
     @property
-    def text(self):
-        return self.objectLookup[self.text_tag]
+    def text1(self):
+        return self.objectLookup[self.text1_tag]
 
-    @text.setter
-    def text(self, value):
-        self.objectLookup[self.text_tag] = value
+    @text1.setter
+    def text1(self, value):
+        self.objectLookup[self.text1_tag] = value
 
     poster_tag = "poster"
     @property
@@ -43,14 +43,14 @@ class post:
     def poster(self, value):
         self.objectLookup[self.poster_tag] = value
         
-    timestamp_tag = "timestamp"
+    timestamp1_tag = "timestamp1"
     @property
-    def timestamp(self):
-        return self.objectLookup[self.timestamp_tag]
+    def timestamp1(self):
+        return self.objectLookup[self.timestamp1_tag]
 
-    @timestamp.setter
-    def timestamp(self, value):
-        self.objectLookup[self.timestamp_tag] = value
+    @timestamp1.setter
+    def timestamp1(self, value):
+        self.objectLookup[self.timestamp1_tag] = value
 
     _id_tag = "id"
     _objectName_tag = "objectName"
